@@ -1,0 +1,12 @@
+.primerDiv{
+    height: 100vh;
+}
+#formLogin{
+    min-height: 50vh;
+}
+#formLogin input[type="email"],#formLogin input[type="password"],#formLogin input[type="user"]{
+    width: 21vw;
+}
+.primerDiv .espacioAux{
+    height: 20vh;
+}
