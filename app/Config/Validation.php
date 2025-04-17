@@ -2,6 +2,10 @@
 
 namespace Config;
 
+use App\Validation\ValidationPass;
+use App\Validation\ValidationAlphaNum;
+use App\Validation\ValidationAlphaNumDash;
+use App\Validation\ValidationAlphaNumSpace;
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\Validation\StrictRules\CreditCardRules;
 use CodeIgniter\Validation\StrictRules\FileRules;
@@ -25,6 +29,10 @@ class Validation extends BaseConfig
         FormatRules::class,
         FileRules::class,
         CreditCardRules::class,
+        ValidationPass::class,
+        ValidationAlphaNum::class,
+        ValidationAlphaNumDash::class,
+        ValidationAlphaNumSpace::class,
     ];
 
     /**
