@@ -6,7 +6,7 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-$routes->get("/tpintegradordb","TpIntegradorDB::index");
+$routes->get("/integradortyhdb","IntegradorTyHDB::index");
 
 $routes->get('/tareas', 'Tareas::index');
 

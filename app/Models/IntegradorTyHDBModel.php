@@ -2,7 +2,7 @@
 namespace App\Models;
 use CodeIgniter\Model;
 
-class TpIntegradorDBModel extends Model{
+class IntegradorTyHDBModel extends Model{
     private $forge;
     public function __construct(){
         $res=1;
@@ -19,7 +19,7 @@ class TpIntegradorDBModel extends Model{
             }
         }
         if(!$res){
-            $res=$this->forge->createDatabase('TpIntegrador', true);
+            $res=$this->forge->createDatabase('IntegradorTyH', true);
         }
         if($res){
             $this->forge = \Config\Database::forge();
@@ -50,9 +50,9 @@ class TpIntegradorDBModel extends Model{
             ]
         ];
 
-        $this->forge->addKey("idUsuario",true);
-        $this->forge->addKey("usuarioUsuario",false,true);
-        $this->forge->addKey("emailUsuario",false,true);
+        $this->forge->addPrimaryKey("idUsuario");
+        $this->forge->addUniqueKey("usuarioUsuario");
+        $this->forge->addUniqueKey("emailUsuario");
 
         $attributes = [
             'engine' => 'InnoDB',
@@ -104,14 +104,13 @@ class TpIntegradorDBModel extends Model{
             ]
         ];
 
-        $this->forge->addKey("idTarea",true);
+        $this->forge->addPrimaryKey("idTarea");
         $this->forge->addForeignKey("autorTarea",
-                                "Usuarios",
-                                "idUsuario",
-                                "cascade",
-                                "cascade",
-                                "fk_tareas_autorTarea");
-
+                                    "Usuarios",
+                                    "idUsuario",
+                                    "cascade",
+                                    "cascade",
+                                    "fk_tareas_autorTarea");
         $attributes = [
             'engine' => 'InnoDB',
             'charset' => 'utf8mb4',
@@ -123,7 +122,7 @@ class TpIntegradorDBModel extends Model{
     private function initSubTareaModel(){
         $fields=[
             "idSubTarea" => [
-                "type" => "INT",
+                "type" => "int",
                 "unasigned" => true,
                 "auto_increment" => true
             ],
@@ -133,7 +132,7 @@ class TpIntegradorDBModel extends Model{
             ],
             "estadoSubTarea"=>[
                 "type" => "enum",
-                "constraint" => ["1","2"],
+                "constraint" => ["1","2","3"],
                 "default" => 1
             ],
             "prioridadSubTarea"=>[
@@ -158,23 +157,32 @@ class TpIntegradorDBModel extends Model{
             "autorSubTarea" => [
                 "type"=> "int",
                 "unasigned" => true
+            ],
+            "idTarea" => [
+                "type"=> "int",
+                "unasigned" => true
             ]
         ];
 
-        $this->forge->addKey("idSubTarea",true);
+        $this->forge->addPrimaryKey("idSubTarea");
         $this->forge->addForeignKey("responsableSubTarea",
-                                "Usuarios",
-                                "idUsuario",
-                                "cascade",
-                                "cascade",
-                                "fk_subTareas_responsableSubTarea");
+                                    "Usuarios",
+                                    "idUsuario",
+                                    "cascade",
+                                    "cascade",
+                                    "fk_subTareas_responsableSubTarea");
         $this->forge->addForeignKey("autorSubTarea",
-                                "Usuarios",
-                                "idUsuario",
-                                "cascade",
-                                "cascade",
-                                "fk_subTareas_autorSubTarea");
-
+                                    "Usuarios",
+                                    "idUsuario",
+                                    "cascade",
+                                    "cascade",
+                                    "fk_subTareas_autorSubTarea");
+        $this->forge->addForeignKey("idTarea",
+                                    "Tareas",
+                                    "idTarea",
+                                    "cascade",
+                                    "cascade",
+                                    "fk_subTareas_idTarea");
         $attributes = [
             'engine' => 'InnoDB',
             'charset' => 'utf8mb4',
@@ -190,22 +198,30 @@ class TpIntegradorDBModel extends Model{
             ],
             "idUsuario" => [
                 "type" => "INT"
+            ],
+            "tipoTareaCompartida" => [
+                "type" => "enum",
+                "constraint" => ["1","2","3"],
+                "default"=> 1
+            ],
+            "estadoTareaCompartida" => [
+                "type" => "boolean",
+                "default" => true
             ]
         ];
 
         $this->forge->addForeignKey("idTarea",
-                                "Tareas",
-                                "idTarea",
-                                "cascade",
-                                "cascade",
-                                "fk_tareasCompartidas_idTarea");
+                                    "Tareas",
+                                    "idTarea",
+                                    "cascade",
+                                    "cascade",
+                                    "fk_tareasCompartidas_idTarea");
         $this->forge->addForeignKey("idUsuario",
-                                "Usuarios",
-                                "idUsuario",
-                                "cascade",
-                                "cascade",
-                                "fk_tareasCompartidas_idUsuario");
-
+                                    "Usuarios",
+                                    "idUsuario",
+                                    "cascade",
+                                    "cascade",
+                                    "fk_tareasCompartidas_idUsuario");
         $attributes = [
             'engine' => 'InnoDB',
             'charset' => 'utf8mb4',

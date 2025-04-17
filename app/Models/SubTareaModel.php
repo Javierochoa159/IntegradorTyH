@@ -9,7 +9,7 @@ class SubTareaModel extends Model{
     protected $allowEmptyInserts=true;
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
-    protected $allowedFields = ['descripcionSubTarea','estadoSubTarea','fechaVencimientoSubTarea','comentarioSubTarea','responsableSubTarea','autorSubTarea'];
+    protected $allowedFields = ['descripcionSubTarea','estadoSubTarea','fechaVencimientoSubTarea','comentarioSubTarea','responsableSubTarea','autorSubTarea','idTarea'];
     protected bool $updateOnlyChanged = true;
     protected $useTimestamps = false;
     protected $dateFormat = 'datetime';
