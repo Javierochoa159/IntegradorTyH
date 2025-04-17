@@ -7,7 +7,8 @@
 </head>
 <body>
     <h1>Mi Pagina de Inicio</h1>
-    <h2><?= $usuario["usuarioUsuario"]."_".$usuario["idUsuario"]."_".$usuario["emailUsuario"] ?></h2>
+    <h2><?= $usuario["id"]."_".$usuario["user"] ?></h2>
+    
     
 </body>
 </html>

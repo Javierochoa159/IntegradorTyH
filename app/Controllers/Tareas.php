@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-//use App\Models\TpIntegradorDB;
+use App\Models\TareaModel;
 
 class Tareas extends BaseController{
     function index(){
