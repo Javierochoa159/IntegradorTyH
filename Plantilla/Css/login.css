@@ -1,11 +1,16 @@
 .primerDiv{
     height: 100vh;
 }
-#formLogin{
+#formLogin, #formRegistrar{
     min-height: 50vh;
 }
-#formLogin input[type="email"],#formLogin input[type="password"],#formLogin input[type="user"]{
-    width: 21vw;
+#formLogin p, #formRegistrar p{
+    max-width: 49vh;
+}
+
+#formLogin input[type="email"],#formLogin input[type="password"],#formLogin input[type="text"],
+#formRegistrar input[type="email"],#formRegistrar input[type="password"],#formRegistrar input[type="text"]{
+    width: 24vw;
 }
 .primerDiv .espacioAux{
     height: 20vh;

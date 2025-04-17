@@ -8,35 +8,53 @@
     <title>Registrarse</title>
 </head>
 <body>
-    <div class="col-12 d-flex flex-column align-items-center primerDiv">
-        <div class="col-6 espacioAux"></div>
-        <form action="<?= base_url()."public/index.php/registrar/exito"?>" id="formLogin" method="post" class="col-5 d-flex align-items-center justify-content-center border border-dark rounded-3">
+    <div class="col-12 d-flex flex-column justify-content-center align-items-center primerDiv">
+        <div class="col-6 espacioAux">
+            <p>
+                <?php $mensajes=session()->getFlashdata("errors");
+                    if(isset($mensajes["errorRegistrar"])){
+                    echo $mensajes["errorRegistrar"];
+                }?>
+            </p>
+        </div>
+        <form action="<?= base_url()."public/index.php/registrar/exito"?>" id="formRegistrar" method="post" class="col-5 d-flex flex-column align-items-center justify-content-center border border-dark rounded-3">
             <div class="col-auto d-flex flex-column align-items-center">
-                <div class="col-12 p-2 d-flex flex-column align-items-center">
+                <div class="col-12 p-2 pt-4 d-flex flex-column align-items-center">
                     <div class="col-12 d-flex flex-column align-items-star justify-content-center">
-                        <label class="fs-3" for="user">Ingrese un nombre</label>
-                        <input class="fs-4" type="text" name="user" value="<?= old("user")?>">
-                        <p><?php if(isset(validation_errors()["user"])){
+                        <label class="fs-3" for="User">Ingrese un nombre</label>
+                        <input class="fs-4" id="User" type="text" name="user" <?php if(old("user")!=null) echo "value='".old("user")."'" ?>>
+                        <p class="mb-0">
+                            <?php if(isset(validation_errors()["user"])){
                                     echo str_replace("user","Usuario",validation_errors()["user"]);
-                        }?></p>
+                            }elseif(isset($mensajes["user"])){
+                                echo $mensajes["user"];
+                            }?>
+                        </p>
                     </div>
                     <div class="col-12 d-flex flex-column align-items-star justify-content-center">
-                        <label class="fs-3" for="email">Ingrese un correo</label>
-                        <input class="fs-4" type="email" name="email" value="<?= old("email")?>" placeholder="ejemplo@email.com">
-                        <p><?php if(isset(validation_errors()["email"])){
+                        <label class="fs-3" for="Email">Ingrese un correo</label>
+                        <input class="fs-4" id="Email" type="email" name="email" <?php if(old("email")!=null) echo "value='".old("email")."'" ?> placeholder="ejemplo@email.com">
+                        <p class="mb-0">
+                            <?php if(isset(validation_errors()["email"])){
                                     echo str_replace("email","Correo",validation_errors()["email"]);
-                        }?></p>
+                            }elseif(isset($mensajes["email"])){
+                                echo $mensajes["email"];
+                            }?>
+                        </p>
                     </div>
-                    <div class="col-12 pt-2 d-flex flex-column align-items-star justify-content-center">
-                        <label class="fs-3" for="pass">Ingrese una contraseña</label>
-                        <input class="fs-4" type="password" name="pass">
-                        <p><?php if(isset(validation_errors()["pass"])){
+                    <div class="col-12 d-flex flex-column align-items-star justify-content-center">
+                        <label class="fs-3" for="Pass">Ingrese una contraseña</label>
+                        <input class="fs-4" id="Pass" type="password" name="pass">
+                        <p class="mb-0"><?php if(isset(validation_errors()["pass"])){
                                     echo str_replace("pass","Contraseña",validation_errors()["pass"]);
                         }?></p>
                     </div>
                 </div>
-                <div class="col-12 p-2 pb-4 d-flex justify-content-end">
+                <div class="col-12 p-2 pb-2 d-flex justify-content-end">
                     <input class="fs-3" type="submit" value="Registrarse">
+                </div>
+                <div class="col-12 pe-2 mb-4 d-flex justify-content-end">
+                    <a href="<?= base_url() ?>public/index.php/login">Tengo una cuenta</a>
                 </div>
             </div>
         </form>
