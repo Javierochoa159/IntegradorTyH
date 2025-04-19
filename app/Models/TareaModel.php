@@ -5,8 +5,7 @@ use CodeIgniter\Model;
 class TareaModel extends Model{
     protected $table = "Tareas";
     protected $primaryKey = 'idTarea';
-    protected $useAutoIncrement=true;
-    protected $allowEmptyInserts=true;
+    protected $useAutoIncrement = true;
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
     protected $allowedFields = ['tituloTarea', 'descripcionTarea','prioridadTarea','estadoTarea','fechaVencimientoTarea','fechaRecordatorioTarea','colorTarea','autorTarea'];

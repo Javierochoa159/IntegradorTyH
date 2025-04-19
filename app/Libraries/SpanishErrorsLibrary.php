@@ -40,6 +40,7 @@ class SpanishErrorsLibrary {
                 case "valid_email": $mensajesReglas["valid_email"] = "Ingrese un email valido"; break;
                 case "valid_emails": $mensajesReglas["valid_emails"] = $entrada." contiene al menos un email no valido"; break;
                 case "valid_url": $mensajesReglas["valid_url"] = "Ingrese una URL valida"; break;
+                case "valid_date": $mensajesReglas["valid_date"] = "Ingrese una fecha valida"; break;
                 case "valid_pass": $mensajesReglas["valid_pass"] = "Contraseña invalida<br>Tiene que contener letras y numeros sin espacios<br>Al menos una Mayuscula<br>Al menos un caracter especial #@|$%&¡!¿?_-"; break;
                 case "valid_alphanum": $mensajesReglas["valid_alphanum"] = "Solo puede contener letras sin espacios<br>Minimo 3 letras<br>Puede tener numeros"; break;
                 case "valid_alphanum_dash": $mensajesReglas["valid_alphanum_dash"] = "Solo puede contener letras sin espacios<br>Minimo 3 letras<br>Puede tener numeros<br>Puede tener _ y/o -"; break;

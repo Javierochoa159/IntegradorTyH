@@ -9,7 +9,7 @@ Class Registrar extends BaseController{
     public function __construct(){ 
         helper ('form');
     }
-    function index(){
+    public function index(){
         return view("RegistrarView");
     }
     public function exito(){
@@ -53,7 +53,6 @@ Class Registrar extends BaseController{
             $sesion=session();
             $user=["id"=>$userId,"user"=>$post["user"]];
             $sesion->set("usuario", $user);
-            //$sesion->setFlashData('mensaje',"Iniciando sesion");
             return redirect()->to('public/index.php/login'); 
         }
     }

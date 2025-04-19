@@ -94,9 +94,9 @@ class IntegradorTyHDBModel extends Model{
                 "null" => true
             ],
             "colorTarea" => [
-                "type" => "varchar",
-                "constraint" => 15,
-                "default"=> "#0000ff"
+                "type" => "enum",
+                "constraint" => ["#6f3c1e","#782069","#401664","#280555","#276d34","#035f78"],
+                "default"=> "#6f3c1e"
             ],
             "autorTarea" => [
                 "type"=> "int",

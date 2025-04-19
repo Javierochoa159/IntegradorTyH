@@ -5,8 +5,7 @@ use CodeIgniter\Model;
 class SubTareaModel extends Model{
     protected $table = "SubTareas";
     protected $primaryKey = 'idSubTarea';
-    protected $useAutoIncrement=true;
-    protected $allowEmptyInserts=true;
+    protected $useAutoIncrement = true;
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
     protected $allowedFields = ['descripcionSubTarea','estadoSubTarea','fechaVencimientoSubTarea','comentarioSubTarea','responsableSubTarea','autorSubTarea','idTarea'];

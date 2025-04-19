@@ -9,15 +9,11 @@ Class Login extends BaseController{
     public function __construct(){ 
         helper ('form');
     }
-    function index(){
-        $sesion=session();
-        if(!$sesion->has("usuario")){
-            $sesion->destroy();
-            return view("LoginView");
+    public function index(){
+        if(session()->has("usuario")){
+            return redirect()->to("/public/index.php/inicio");
         }
-        $data=["usuario"=>$sesion->get("usuario")];
-        return view("InicioView",$data);
-
+        return view("LoginView");
     }
     public function exito(){
         helper("spanishErrors_helper");
@@ -57,9 +53,9 @@ Class Login extends BaseController{
                 "id"=>$userInfo[0]["idUsuario"],
                 "user"=>$userInfo[0]["usuarioUsuario"]
             ];
-            $sesion=session();
-            $sesion->set("usuario", $userInfo);
-            return redirect()->to('public/index.php/login'); 
+            session()->start();
+            session()->set("usuario", $userInfo);
+            return redirect()->to('public/index.php/inicio'); 
         }
     }
 }
