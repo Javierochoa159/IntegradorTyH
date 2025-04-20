@@ -12,7 +12,7 @@ Class Inicio extends BaseController{
     public function index(){
         if(session()->has("usuario")){
             $tarea = new TareaModel;
-            $datos["tareas"]=$tarea->select(["tituloTarea", "descripcionTarea", "prioridadTarea", "estadoTarea", "fechaVencimientoTarea", "fechaRecordatorioTarea", "colorTarea"])->where("autorTarea",session()->get("usuario")["id"])->whereNotIn("estadoTarea",[3])->find();
+            $datos["tareas"]=$tarea->select(["tituloTarea", "descripcionTarea", "prioridadTarea", "estadoTarea", "fechaVencimientoTarea", "fechaRecordatorioTarea", "colorTarea"])->where("autorTarea",session()->get("usuario")["id"])->whereNotIn("estadoTarea",[3])->orderBy("idTarea","desc")->find();
             $tarea=null;
             return view("InicioView",$datos);
         }
@@ -24,8 +24,8 @@ Class Inicio extends BaseController{
         $post=$this->request->getPost(["tituloTarea","descripcionTarea","prioridadTarea","colorTarea","fechaVencimientoTarea","fechaRecordatorioTarea"]);
         $validacion = service('validation');
         $reglas=[
-            "tituloTarea" =>"required|valid_alphanum_space",
-            "descripcionTarea" =>"required|valid_alphanum_space",
+            "tituloTarea" =>"required|valid_alphanum_space|max_length[30]|min_length[6]",
+            "descripcionTarea" =>"required|valid_alphanum_space|max_length[255]|min_length[10]",
             "fechaVencimientoTarea" =>"required|valid_date"
         ];
         $validacion->setRules($reglas,spanishErrorMessages($reglas));
@@ -44,9 +44,9 @@ Class Inicio extends BaseController{
         if($post["fechaRecordatorioTarea"]!=null) $sqlIn["fechaRecordatorioTarea"]=$post["fechaRecordatorioTarea"];
         $tarea=new TareaModel();
         if($tarea->insert($sqlIn)){
-            return redirect()->to('public/index.php/inicio')->with("mensaje","Tarea creada!");
+            return redirect()->to('public/index.php/inicio')->with("mensaje",["success"=>"Tarea creada!"]);
         }else{
-            return redirect()->to('public/index.php/inicio')->with("mensaje","Error al crear la tarea<br>Intente nuevamente en unos minutos");
+            return redirect()->to('public/index.php/inicio')->with("mensaje",["error"=>"Error al crear la tarea<br>Intente nuevamente en unos minutos"]);
         }
     }
 

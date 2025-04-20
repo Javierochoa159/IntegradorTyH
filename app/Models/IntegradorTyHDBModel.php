@@ -95,8 +95,8 @@ class IntegradorTyHDBModel extends Model{
             ],
             "colorTarea" => [
                 "type" => "enum",
-                "constraint" => ["#6f3c1e","#782069","#401664","#280555","#276d34","#035f78"],
-                "default"=> "#6f3c1e"
+                "constraint" => ["#6f3c1ed6","#782069d6","#401664d6","#280555d6","#276d34d6","#035f78d6"],
+                "default"=> "#6f3c1ed6"
             ],
             "autorTarea" => [
                 "type"=> "int",

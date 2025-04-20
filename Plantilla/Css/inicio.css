@@ -2,19 +2,72 @@ aside{
     width: 14.75%;
 }
 aside .bg-azulito{
-    background-color: #11505596;
-    border: solid 0.15rem #898683a3;
+    background-color: #115055b6;
+    border: solid 0.15rem #898683b6;
 
 }
-aside .bg-dark:hover{
-    background-color: #27384c !important;
+aside .bg-azulitoNo:hover{
+    background-color: #27384cb6 !important;
 }
 
 .principalDiv{
     width: 85.25%;
 }
 
-.tareasDiv{
+body.dark{
+    background-color: #212529;
+}
+body.light{
+    background-color: #fff;
+}
+.dark{
+    color:#fff;
+}
+select.dark{
+    background-color: #212529;
+}
+select.light{
+    background-color: #fff;
+}
+.light{
+    color:#000;
+}
+#dark_light, #grid_list{
+    display: flex;
+    width: 38px;
+    height: 37px;
+    align-items: center;
+    justify-content: center;
+}
+#dark_light img, #grid_list img{
+    width: 34px;
+}
+.modal-content.dark{
+    background-color: #212529;
+    border: solid 0.02rem #fff;
+    color: #fff;
+}
+.modal-content.light{
+    background-color: #fff;
+    border: solid 0.02rem #000;
+    color: #000;
+}
+
+.colorTarea ul.dark li{
+    background-color: #212529;
+}
+.colorTarea ul.light li{
+    background-color: #fff;
+}
+
+#prioridadTarea, #fechaVencimientoTarea, #fechaRecordatorioTarea{
+    border-radius: 7px;
+}
+#fechaVencimientoTarea, #fechaRecordatorioTarea{
+    margin-top: 0.3rem;
+}
+
+#tareasDiv.grid{
     min-height: 80vh;
     padding-left: 10px;
     padding-right: 10px;
@@ -23,6 +76,11 @@ aside .bg-dark:hover{
     align-items: center;
     justify-content: flex-start;
     align-content: flex-start;
+}
+#tareasDiv.list{
+    min-height: 60vh;
+    padding: 0 10px 0 10px;
+    display: block;
 }
 
 #newTareaModal .modal-content{
@@ -34,19 +92,54 @@ aside .bg-dark:hover{
     resize: none;
 }
 
-.tareasDiv .tarea{
+#tareasDiv.grid .tarea{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     margin: 10px;
-    border-radius: 15px;
-    min-width: 18rem;
-    min-height: 7rem;
+    border-radius: 7px;
+    min-width: 17.5rem;
+    min-height: 7.5rem;
 }
-.tareasDiv .prioriTarea_3{
+#tareasDiv.grid .tarea .fechaEstadoTarea{
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    margin: 0;
+}
+#tareasDiv.list .tarea{
+    display: flex;
+    margin: 10px;
+    border-radius: 7px;
+    min-height: 4rem;
+}
+#tareasDiv.list .tarea div{
+    width: 50%;
+    display: flex;
+}
+#tareasDiv.list .tarea .tituloTarea h3{
+    margin: 0.3rem;
+}
+#tareasDiv.list .tarea .tituloTarea{
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: 0.5rem;
+}
+#tareasDiv.list .tarea .fechaEstadoTarea{
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 0.5rem;
+}
+#tareasDiv.list .tarea .fechaEstadoTarea p{
+    margin: 0.3rem;
+}
+#tareasDiv .prioriTarea_3{
     border: solid 0.1rem red;
 }
-.tareasDiv .prioriTarea_2{
+#tareasDiv .prioriTarea_2{
     border: solid 0.1rem yellow;
 }
-.tareasDiv .prioriTarea_1{
+#tareasDiv .prioriTarea_1{
     border: solid 0.1rem blue;
 }
 #colorTarea{
@@ -88,6 +181,7 @@ aside .bg-dark:hover{
     border-radius: 0 5px 5px 0;
 }
 .colorTarea ul li:hover{
+    cursor: pointer;
     border: solid 0.01rem #6c757d;
 }
 .colorTarea ul li label:hover{
@@ -102,7 +196,7 @@ aside .bg-dark:hover{
 .colorTarea button div{
     width: 2rem;
     height: 1.5rem;
-    background-color: #6f3c1e;
+    background-color: #6f3c1ed6;
     border-radius: 5px;
 }
 .colorTarea button.dropdown-toggle::after{
@@ -114,3 +208,30 @@ aside .bg-dark:hover{
 #fecha{
     max-width: 10rem;
 }
+
+#tareasDiv.list .fechaEstadoTarea p.frt{
+    width: 7.76rem;
+}
+#tareasDiv.list .fechaEstadoTarea div{
+    width: 65%;
+    justify-content: space-between;
+}
+#tareasDiv.grid .fechaEstadoTarea div{
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+}
+#tareasDiv.grid .fechaEstadoTarea p.et{
+    width: 100%;
+    text-align: end;
+    margin-bottom: 0.5rem;
+    padding-right: 0.5rem;
+}
+#tareasDiv .fechaEstadoTarea p.et{
+    width: 4.87rem;
+}
+#tareasDiv .fechaEstadoTarea p{
+    margin: 0;
+}
+
