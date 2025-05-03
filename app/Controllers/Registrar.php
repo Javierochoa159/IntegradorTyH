@@ -25,7 +25,7 @@ Class Registrar extends BaseController{
         $validacion->setRules($reglas,spanishErrorMessages($reglas));
         if (!$validacion->withRequest($this->request)->run())
         {
-            return redirect()->to("/public/index.php/registrar")->withInput();
+            return redirect()->to(base_url()."registrar")->withInput();
         }
         $user=new UsuarioModel();
         $mensaje=array();
@@ -38,7 +38,8 @@ Class Registrar extends BaseController{
             $mensaje["email"]= "El correo ingresado ya está en uso.";
         }
         if(!empty($mensaje)){
-            return redirect()->to("/public/index.php/registrar")->withInput()->with('errors',$mensaje);
+            $user=null;
+            return redirect()->to(base_url()."registrar")->withInput()->with('errors',$mensaje);
         }else{
             $this->encriptado=\Config\Services::encrypter();
             $userId=$usuario->insert([
@@ -48,12 +49,12 @@ Class Registrar extends BaseController{
             ],true);
             $post["pass"]="";
             if(!$userId){
-                return redirect()->to("/public/index.php/registrar")->with('errors',["errorRegistrar"=>"Ocurrio un error al crear la cuenta<br>Intente nuevamente despues de unos minutos."]);
+                $user=null;
+                return redirect()->to(base_url()."registrar")->with('errors',["errorRegistrar"=>"Ocurrio un error al crear la cuenta<br>Intente nuevamente despues de unos minutos."]);
             }
-            $sesion=session();
             $user=["id"=>$userId,"user"=>$post["user"]];
-            $sesion->set("usuario", $user);
-            return redirect()->to('public/index.php/login'); 
+            session()->set("usuario", $user);
+            return redirect()->to(base_url().'login'); 
         }
     }
 }

@@ -11,7 +11,7 @@ Class Login extends BaseController{
     }
     public function index(){
         if(session()->has("usuario")){
-            return redirect()->to("/public/index.php/inicio");
+            return redirect()->to(base_url()."inicio");
         }
         return view("LoginView");
     }
@@ -26,7 +26,7 @@ Class Login extends BaseController{
         $validacion->setRules($reglas,spanishErrorMessages($reglas));
         if (!$validacion->withRequest($this->request)->run())
         {
-            return redirect()->to("/public/index.php/login")->withInput();
+            return redirect()->to(base_url()."login")->withInput();
         }
         
         $user=new UsuarioModel();
@@ -43,11 +43,13 @@ Class Login extends BaseController{
             $data=null;
         }
         if(!empty($mensaje)){
-            return redirect()->to("/public/index.php/login")->withInput()->with('errors',$mensaje);
+            $user=null;
+            return redirect()->to(base_url()."login")->withInput()->with('errors',$mensaje);
         }else{
             $userInfo=$user->where('emailUsuario',$post["email"])->find();
+            $user=null;
             if(empty($userInfo)){
-                return redirect()->to("/public/index.php/login")->with('errors',["errorLogin"=>"Ocurrio un error al iniciar sesion<br>Intente nuevamente despues de unos minutos."]);
+                return redirect()->to(base_url()."login")->with('errors',["errorLogin"=>"Ocurrio un error al iniciar sesion<br>Intente nuevamente despues de unos minutos."]);
             }
             $userInfo=[
                 "id"=>$userInfo[0]["idUsuario"],
@@ -55,7 +57,7 @@ Class Login extends BaseController{
             ];
             session()->start();
             session()->set("usuario", $userInfo);
-            return redirect()->to('public/index.php/inicio'); 
+            return redirect()->to(base_url().'inicio'); 
         }
     }
 }
