@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
-    <link rel="stylesheet" href="<?= base_url() ?>Plantilla/Css/login.css">
+    <link rel="stylesheet" href="<?= substr(base_url(),0,-17) ?>Plantilla/Css/login.css">
     <title>Login</title>
 </head>
 <body>
@@ -17,7 +17,7 @@
                 }?>
             </p>
         </div>
-        <form action="<?= base_url()."public/index.php/login/exito"?>" id="formLogin" method="post" class="col-5 d-flex flex-column align-items-center justify-content-center border border-dark rounded-3">
+        <form action="<?= base_url()."login/exito"?>" id="formLogin" method="post" class="col-5 d-flex flex-column align-items-center justify-content-center border border-dark rounded-3">
             <div class="col-auto d-flex flex-column align-items-center">
                 <div class="col-12 p-2 d-flex flex-column align-items-center">
                     <div class="col-12 d-flex flex-column align-items-star justify-content-center">
@@ -47,7 +47,7 @@
                     <input class="fs-3" type="submit" value="Iniciar Sesion">
                 </div>
                 <div class="col-12 pe-2 mb-4 d-flex justify-content-end">
-                    <a href="<?= base_url() ?>public/index.php/registrar">Crear una cuenta</a>
+                    <a href="<?= base_url() ?>registrar">Crear una cuenta</a>
                 </div>
             </div>
         </form>
