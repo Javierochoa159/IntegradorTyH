@@ -1,0 +1,293 @@
+aside{
+    width: 14.75%;
+}
+aside .bg-azulito{
+    background-color: #115055b6;
+    border: solid 0.15rem #898683b6;
+
+}
+aside .bg-azulitoNo:hover{
+    background-color: #27384cb6 !important;
+}
+
+.principalDiv{
+    width: 85.25%;
+}
+
+body.dark{
+    background-color: #212529;
+}
+body.light{
+    background-color: #f0f1db;
+}
+.dark{
+    color:#fff;
+}
+select.dark{
+    background-color: #212529;
+}
+select.light{
+    background-color: #fff;
+}
+.light{
+    color:#000;
+}
+#dark_light{
+    display: flex;
+    width: 38px;
+    height: 37px;
+    align-items: center;
+    justify-content: center;
+}
+#dark_light img{
+    width: 34px;
+}
+.subTarea{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 28vh;
+    border-radius: 7px;
+    position: relative;
+}
+
+.subTarea .descripcionSubTarea p{
+    min-height: 15vh;
+}
+.subTarea .descripcionSubTarea .dark{
+    border-bottom: solid 0.01rem white;
+}
+.subTarea .descripcionSubTarea .light{
+    border-bottom: solid 0.01rem black;
+}
+.subTarea .pieSubTarea{
+    display: flex;
+    justify-content: space-around;
+}
+.subTarea .fechasSubTarea .frt{
+    width: 7.76rem;
+}
+.subTarea.prioriSubTarea_4{
+    border: solid 0.1rem red;
+}
+.subTarea.prioriSubTarea_3{
+    border: solid 0.1rem yellow;
+}
+.subTarea.prioriSubTarea_2{
+    border: solid 0.1rem blue;
+}
+.subTarea.prioriSubTarea_1.light{
+    border: solid 0.1rem #000000;
+}
+.subTarea.prioriSubTarea_1.dark{
+    border: solid 0.1rem #ffffff;
+}
+
+.subTarea .optSubTarea{
+    border-radius: 4px;
+    position: absolute;
+    top: 3px;
+    right: 3px;
+}
+.subTarea .optSubTarea ul.dark li .dropdown-item:focus,.subTarea .optSubTarea ul.dark li .dropdown-item:hover{
+    background-color: #02041ff5;
+    border: solid 0.01rem #6c757d;
+    border-radius: 7px;
+}
+.subTarea button.dropdown-toggle::after{
+    content: none;
+}
+.subTarea .optSubTarea button img{
+    width: 34px;
+}
+.subTarea .optSubTarea button{
+    margin: 0;
+    padding: 0;
+}
+.subTarea .optSubTarea .dropdown-menu.show {
+    left: -16.6vh !important;
+}
+
+#modSubTareaModal .modal-content{
+    min-width: 35vw;
+}
+
+#modSubTareaModal textarea{
+    height: 120px;
+    resize: none;
+}
+#prioridadSubTarea{
+    border-radius: 7px;
+}
+
+.modal-content.dark{
+    background-color: #212529;
+    border: solid 0.02rem #fff;
+    color: #fff;
+}
+.modal-content.light{
+    background-color: #fff;
+    border: solid 0.02rem #000;
+    color: #000;
+}
+.dropdown ul.dark{
+    border: solid 0.01rem #6c757d;
+    background-color: #212529;
+    padding: 0.5rem;
+}
+.dropdown ul.dark li{
+    background-color: #212529 !important;
+}
+.dropdown ul.dark li .dropdown-item,.dropdown ul.dark li .dropdown-item{
+    border: solid 0.01rem #00000000;
+    border-radius: 7px;
+}
+.dropdown ul.light li{
+    background-color: #fff !important;
+}
+.colorSubTarea ul.dark li{
+    background-color: #212529;
+}
+.colorSubTarea ul.light li{
+    background-color: #fff;
+}
+
+#prioridadSubTarea{
+    max-width: max-content;
+}
+
+
+#newComentarioModal .modal-content{
+    min-width: 35vw;
+}
+
+.dropdown button.dropdown-toggle::after{
+    content: none;
+}
+
+#descripcionSubTarea{
+    height: 120px;
+    resize: none;
+}
+#comentarioComentario{
+    height: 90px;
+    resize: none;
+}
+#comentariosDiv.list {
+    min-height: 30vh;
+    padding: 0 10px 0 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#comentariosDiv.list .comentario{
+    display: flex;
+    align-items: center;
+    margin: 10px;
+    border-radius: 7px;
+    min-height: 4rem;
+    background-color: #27384cb6;
+}
+
+#comentariosDiv .comentario.dark{
+    border: solid 0.1rem #ffffff;
+}
+#comentariosDiv .comentario.light{
+    border: solid 0.1rem #000000;
+}
+
+
+#colorSubTarea{
+    display: none;
+}
+.colorSubTarea{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    border-radius: 5px;
+    margin-left: 0.5rem;
+    position: relative;
+}
+.colorSubTarea ul.dropdown-menu{
+    display: none !important;
+    min-width: 3rem;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
+.colorSubTarea ul.dropdown-menu.show{
+    display: flex !important;
+    right: 0 !important;
+}
+.colorSubTarea ul li{
+    width: fit-content;
+    padding: 0.5em;
+    border: solid 0.01rem rgba(0, 0, 0, 0);
+}
+.colorSubTarea ul li label{
+    width: 2rem;
+    height: 1.5rem;
+    border-radius: var(--bs-border-radius);
+}
+.colorSubTarea ul li.labelColorF{
+    border-radius: 5px 0 0 5px;
+}
+.colorSubTarea ul li.labelColorL{
+    border-radius: 0 5px 5px 0;
+}
+.colorSubTarea ul li:hover{
+    cursor: pointer;
+    border: solid 0.01rem #6c757d;
+}
+.colorSubTarea ul li label:hover{
+    cursor: pointer;
+}
+.colorSubTarea button{
+    width: 100%;
+    height: 100%;
+    padding: 0.5rem;
+    border: solid 0.01rem #6c757d;
+}
+.colorSubTarea button div{
+    width: 2rem;
+    height: 1.5rem;
+    background-color: #6f3c1e5c;
+    border-radius: 5px;
+}
+.colorSubTarea button.dropdown-toggle::after{
+    content: none;
+}
+#newSubTarea label[for="fecha"]{
+    width: fit-content;
+}
+#fecha{
+    max-width: 10rem;
+}
+
+#subTareasDiv.list .fechaEstadoSubTarea p.frt{
+    width: 7.76rem;
+}
+#subTareasDiv.list .fechaEstadoSubTarea div{
+    width: 65%;
+    justify-content: space-between;
+}
+#subTareasDiv.grid .fechaEstadoSubTarea div{
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+}
+#subTareasDiv.grid .fechaEstadoSubTarea p.et{
+    width: 100%;
+    text-align: end;
+    margin-bottom: 0.5rem;
+    padding-right: 0.5rem;
+}
+#subTareasDiv .fechaEstadoSubTarea p.et{
+    width: 4.87rem;
+}
+#subTareasDiv .fechaEstadoSubTarea p{
+    margin: 0;
+}
+

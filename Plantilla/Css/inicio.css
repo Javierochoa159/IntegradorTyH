@@ -18,7 +18,7 @@ body.dark{
     background-color: #212529;
 }
 body.light{
-    background-color: #fff;
+    background-color: #f0f1db;
 }
 .dark{
     color:#fff;
@@ -52,12 +52,25 @@ select.light{
     border: solid 0.02rem #000;
     color: #000;
 }
-
-.colorTarea ul.dark li{
+.dropdown ul.dark{
+    border: solid 0.01rem #6c757d;
     background-color: #212529;
+    padding: 0.5rem;
 }
-.colorTarea ul.light li{
-    background-color: #fff;
+.dropdown ul.dark li{
+    background-color: #212529 !important;
+}
+.dropdown ul.dark li .dropdown-item,.dropdown ul.dark li .dropdown-item{
+    border: solid 0.01rem #00000000;
+    border-radius: 7px;
+}
+.ordenPagina ul.dark li .dropdown-item:focus,.ordenPagina ul.dark li .dropdown-item:hover{
+    background-color: #02041ff5;
+    border: solid 0.01rem #6c757d;
+    border-radius: 7px;
+}
+.dropdown ul.light li{
+    background-color: #fff !important;
 }
 
 #prioridadTarea, #fechaVencimientoTarea, #fechaRecordatorioTarea{
@@ -92,45 +105,53 @@ select.light{
     resize: none;
 }
 
-#tareasDiv.grid .tarea{
+#tareasDiv.grid .tarea, #tareasDiv.grid .subtarea{
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    align-items: center;
     margin: 10px;
     border-radius: 7px;
     min-width: 17.5rem;
     min-height: 7.5rem;
 }
-#tareasDiv.grid .tarea .fechaEstadoTarea{
+#tareasDiv.grid .tarea a, #tareasDiv.grid .subtarea a{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+#tareasDiv.grid .tarea .fechaEstadoTarea, #tareasDiv.grid .subtarea .fechaEstadoTarea{
     display: flex;
     flex-direction: column;
     justify-content: start;
     margin: 0;
 }
-#tareasDiv.list .tarea{
+#tareasDiv.list .tarea, #tareasDiv.list .subtarea{
     display: flex;
+    align-items: center;
     margin: 10px;
     border-radius: 7px;
     min-height: 4rem;
 }
-#tareasDiv.list .tarea div{
+#tareasDiv.list .tarea a, #tareasDiv.list .subtarea a{
+    display: flex;
+}
+#tareasDiv.list .tarea div, #tareasDiv.list .subtarea div{
     width: 50%;
     display: flex;
 }
-#tareasDiv.list .tarea .tituloTarea h3{
+#tareasDiv.list .tarea .tituloTarea h3, #tareasDiv.list .subtarea .tituloTarea h3{
     margin: 0.3rem;
 }
-#tareasDiv.list .tarea .tituloTarea{
+#tareasDiv.list .tarea .tituloTarea, #tareasDiv.list .subtarea .tituloTarea{
     justify-content: flex-start;
     align-items: center;
     padding-left: 0.5rem;
 }
-#tareasDiv.list .tarea .fechaEstadoTarea{
+#tareasDiv.list .tarea .fechaEstadoTarea, #tareasDiv.list .subtarea .fechaEstadoTarea{
     justify-content: space-between;
     align-items: center;
     padding-right: 0.5rem;
 }
-#tareasDiv.list .tarea .fechaEstadoTarea p{
+#tareasDiv.list .tarea .fechaEstadoTarea p, #tareasDiv.list .subtarea .fechaEstadoTarea p{
     margin: 0.3rem;
 }
 #tareasDiv .prioriTarea_3{
@@ -141,6 +162,21 @@ select.light{
 }
 #tareasDiv .prioriTarea_1{
     border: solid 0.1rem blue;
+}
+#tareasDiv .prioriSubTarea_4{
+    border: solid 0.1rem red;
+}
+#tareasDiv .prioriSubTarea_3{
+    border: solid 0.1rem yellow;
+}
+#tareasDiv .prioriSubTarea_2{
+    border: solid 0.1rem blue;
+}
+#tareasDiv.dark .prioriSubTarea_1{
+    border: solid 0.1rem #ffffff;
+}
+#tareasDiv.light .prioriSubTarea_1{
+    border: solid 0.1rem #000000;
 }
 #colorTarea{
     display: none;
@@ -196,10 +232,10 @@ select.light{
 .colorTarea button div{
     width: 2rem;
     height: 1.5rem;
-    background-color: #6f3c1ed6;
+    background-color: #6f3c1e5c;
     border-radius: 5px;
 }
-.colorTarea button.dropdown-toggle::after{
+.dropdown button.dropdown-toggle::after{
     content: none;
 }
 #newTarea label[for="fecha"]{

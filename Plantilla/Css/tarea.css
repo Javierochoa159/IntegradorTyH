@@ -1,0 +1,386 @@
+aside{
+    width: 14.75%;
+}
+aside .bg-azulito{
+    background-color: #115055b6;
+    border: solid 0.15rem #898683b6;
+
+}
+aside .bg-azulitoNo:hover{
+    background-color: #27384cb6 !important;
+}
+
+.principalDiv{
+    width: 85.25%;
+}
+
+body.dark{
+    background-color: #212529;
+}
+body.light{
+    background-color: #f0f1db;
+}
+.dark{
+    color:#fff;
+}
+select.dark{
+    background-color: #212529;
+}
+select.light{
+    background-color: #fff;
+}
+.light{
+    color:#000;
+}
+#dark_light{
+    display: flex;
+    width: 38px;
+    height: 37px;
+    align-items: center;
+    justify-content: center;
+}
+#dark_light img{
+    width: 34px;
+}
+.tarea{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 28vh;
+    border-radius: 7px;
+    position: relative;
+}
+.tarea div li p:hover{
+    cursor: pointer;
+}
+.tarea .tituloTarea h3{
+    overflow-wrap: break-word;
+}
+.tarea .descripcionTarea p{
+    min-height: 15vh;
+}
+.tarea .descripcionTarea .dark, .tarea .tituloTarea .dark{
+    border-bottom: solid 0.01rem white;
+}
+.tarea .descripcionTarea .light, .tarea .tituloTarea .light{
+    border-bottom: solid 0.01rem black;
+}
+.tarea .pieTarea{
+    display: flex;
+    justify-content: space-around;
+}
+.tarea .fechasTarea .frt{
+    width: 7.76rem;
+}
+.tarea.prioriTarea_3{
+    border: solid 0.1rem red;
+}
+.tarea.prioriTarea_2{
+    border: solid 0.1rem yellow;
+}
+.tarea.prioriTarea_1{
+    border: solid 0.1rem blue;
+}
+.tarea .optTarea{
+    border-radius: 4px;
+    position: absolute;
+    top: 3px;
+    right: 3px;
+}
+.tarea .optTarea ul.dark li .dropdown-item:focus,.tarea .optTarea ul.dark li .dropdown-item:hover{
+    background-color: #02041ff5;
+    border: solid 0.01rem #6c757d;
+    border-radius: 7px;
+}
+.tarea button.dropdown-toggle::after{
+    content: none;
+}
+.tarea .optTarea button img{
+    width: 34px;
+}
+.tarea .optTarea button{
+    margin: 0;
+    padding: 0;
+}
+.tarea .optTarea .dropdown-menu.show {
+    left: -16.6vh !important;
+}
+
+#modTareaModal .modal-content{
+    min-width: 35vw;
+}
+
+#modTareaModal textarea{
+    height: 120px;
+    resize: none;
+}
+#prioridadTarea, #fechaRecordatorioTarea{
+    border-radius: 7px;
+}
+#fechaRecordatorioTarea{
+    margin-top: 0.3rem;
+}
+#colorTarea{
+    display: none;
+}
+.colorTarea{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    border-radius: 5px;
+    margin-left: 0.5rem;
+}
+.colorTarea ul.dropdown-menu{
+    display: none !important;
+    min-width: 3rem;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
+.colorTarea ul.dropdown-menu.show{
+    display: flex !important;
+    left: -104px !important;
+    padding: 0;
+}
+.colorTarea ul li{
+    width: fit-content;
+    padding: 0.5em;
+    border: solid 0.01rem rgba(0, 0, 0, 0);
+}
+.colorTarea ul li label{
+    width: 2rem;
+    height: 1.5rem;
+    border-radius: var(--bs-border-radius);
+}
+.colorTarea ul li.labelColorF{
+    border-radius: 5px 0 0 5px;
+}
+.colorTarea ul li.labelColorL{
+    border-radius: 0 5px 5px 0;
+}
+.colorTarea ul li:hover{
+    cursor: pointer;
+    border: solid 0.01rem #6c757d;
+}
+.colorTarea ul li label:hover{
+    cursor: pointer;
+}
+.colorTarea button{
+    width: 100%;
+    height: 100%;
+    padding: 0.5rem;
+    border: solid 0.01rem #6c757d;
+}
+.colorTarea button div{
+    width: 2rem;
+    height: 1.5rem;
+    border-radius: 5px;
+}
+
+.modal-content.dark{
+    background-color: #212529;
+    border: solid 0.02rem #fff;
+    color: #fff;
+}
+.modal-content.light{
+    background-color: #fff;
+    border: solid 0.02rem #000;
+    color: #000;
+}
+.dropdown ul.dark{
+    border: solid 0.01rem #6c757d;
+    background-color: #212529;
+    padding: 0.5rem;
+}
+.dropdown ul.dark li{
+    background-color: #212529 !important;
+}
+.dropdown ul.dark li .dropdown-item,.dropdown ul.dark li .dropdown-item{
+    border: solid 0.01rem #00000000;
+    border-radius: 7px;
+}
+.dropdown ul.light li{
+    background-color: #fff !important;
+}
+.colorSubTarea ul.dark li{
+    background-color: #212529;
+}
+.colorSubTarea ul.light li{
+    background-color: #fff;
+}
+
+#prioridadSubTarea{
+    max-width: max-content;
+}
+.ordenPagina ul.dark li .dropdown-item:focus,.ordenPagina ul.dark li .dropdown-item:hover{
+    background-color: #02041ff5;
+    border: solid 0.01rem #6c757d;
+    border-radius: 7px;
+}
+
+#subTareasDiv.list{
+    min-height: 30vh;
+    padding: 0 10px 0 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#newSubTareaModal .modal-content{
+    min-width: 35vw;
+}
+
+.dropdown button.dropdown-toggle::after{
+    content: none;
+}
+
+#descripcionSubTarea{
+    height: 120px;
+    resize: none;
+}
+#comentarioSubTarea{
+    height: 90px;
+    resize: none;
+}
+
+#subTareasDiv.list .subTarea{
+    display: flex;
+    align-items: center;
+    margin: 10px;
+    border-radius: 7px;
+    min-height: 4rem;
+}
+
+#subTareasDiv.list .subTarea a{
+    display: flex;
+}
+#subTareasDiv.list .subTarea div{
+    width: 50%;
+    display: flex;
+}
+#subTareasDiv.list .subTarea .tituloSubTarea h3{
+    margin: 0.3rem;
+}
+#subTareasDiv.list .subTarea .tituloSubTarea{
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: 0.5rem;
+}
+#subTareasDiv.list .subTarea .fechaEstadoSubTarea{
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 0.5rem;
+}
+#subTareasDiv.list .subTarea .fechaEstadoSubTarea p{
+    margin: 0.3rem;
+}
+#subTareasDiv .prioriSubTarea_4{
+    border: solid 0.1rem red;
+}
+#subTareasDiv .prioriSubTarea_3{
+    border: solid 0.1rem yellow;
+}
+#subTareasDiv .prioriSubTarea_2{
+    border: solid 0.1rem blue;
+}
+#subTareasDiv.dark .prioriSubTarea_1{
+    border: solid 0.1rem #ffffff;
+}
+#subTareasDiv.light .prioriSubTarea_1{
+    border: solid 0.1rem #000000;
+}
+#colorSubTarea{
+    display: none;
+}
+.colorSubTarea{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    border-radius: 5px;
+    margin-left: 0.5rem;
+    position: relative;
+}
+.colorSubTarea ul.dropdown-menu{
+    display: none !important;
+    min-width: 3rem;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
+.colorSubTarea ul.dropdown-menu.show{
+    display: flex !important;
+    right: 0 !important;
+}
+.colorSubTarea ul li{
+    width: fit-content;
+    padding: 0.5em;
+    border: solid 0.01rem rgba(0, 0, 0, 0);
+}
+.colorSubTarea ul li label{
+    width: 2rem;
+    height: 1.5rem;
+    border-radius: var(--bs-border-radius);
+}
+.colorSubTarea ul li.labelColorF{
+    border-radius: 5px 0 0 5px;
+}
+.colorSubTarea ul li.labelColorL{
+    border-radius: 0 5px 5px 0;
+}
+.colorSubTarea ul li:hover{
+    cursor: pointer;
+    border: solid 0.01rem #6c757d;
+}
+.colorSubTarea ul li label:hover{
+    cursor: pointer;
+}
+.colorSubTarea button{
+    width: 100%;
+    height: 100%;
+    padding: 0.5rem;
+    border: solid 0.01rem #6c757d;
+}
+.colorSubTarea button div{
+    width: 2rem;
+    height: 1.5rem;
+    background-color: #6f3c1e5c;
+    border-radius: 5px;
+}
+.colorSubTarea button.dropdown-toggle::after{
+    content: none;
+}
+#newSubTarea label[for="fecha"]{
+    width: fit-content;
+}
+#fecha{
+    max-width: 10rem;
+}
+
+#subTareasDiv.list .fechaEstadoSubTarea p.frt{
+    width: 7.76rem;
+}
+#subTareasDiv.list .fechaEstadoSubTarea div{
+    width: 65%;
+    justify-content: space-between;
+}
+#subTareasDiv.grid .fechaEstadoSubTarea div{
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+}
+#subTareasDiv.grid .fechaEstadoSubTarea p.et{
+    width: 100%;
+    text-align: end;
+    margin-bottom: 0.5rem;
+    padding-right: 0.5rem;
+}
+#subTareasDiv .fechaEstadoSubTarea p.et{
+    width: 4.87rem;
+}
+#subTareasDiv .fechaEstadoSubTarea p{
+    margin: 0;
+}
+
