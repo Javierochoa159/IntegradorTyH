@@ -26,6 +26,7 @@ class IntegradorTyHDBModel extends Model{
             $this->initUsuarioModel();
             $this->initTareaModel();
             $this->initSubTareaModel();
+            $this->initComentarios();
             $this->initTareaCompartidaModel();
         }
     }
@@ -95,8 +96,8 @@ class IntegradorTyHDBModel extends Model{
             ],
             "colorTarea" => [
                 "type" => "enum",
-                "constraint" => ["#6f3c1ed6","#782069d6","#401664d6","#280555d6","#276d34d6","#035f78d6"],
-                "default"=> "#6f3c1ed6"
+                "constraint" => ["#6f3c1e5c","#7820695c","#4016645c","#2805555c","#276d345c","#035f785c"],
+                "default"=> "#6f3c1e5c"
             ],
             "autorTarea" => [
                 "type"=> "int",
@@ -137,22 +138,21 @@ class IntegradorTyHDBModel extends Model{
             ],
             "prioridadSubTarea"=>[
                 "type" => "enum",
-                "constraint" => ["1","2","3"],
-                "null" => true
+                "constraint" => ["1","2","3","4"],
+                "default" => "1"
             ],
             "fechaVencimientoSubTarea" => [
                 "type" => "datetime",
                 "null" => true
             ],
-            "comentarioSubTarea" => [
-                "type" => "varchar",
-                "constraint" => 50,
-                "null" => true
+            "colorSubTarea" => [
+                "type" => "enum",
+                "constraint" => ["#6f3c1e5c","#7820695c","#4016645c","#2805555c","#276d345c","#035f785c"],
+                "default"=> "#6f3c1e5c"
             ],
             "responsableSubTarea" => [
                 "type"=> "int",
-                "unasigned" => true,
-                "null" => true
+                "unasigned" => true
             ],
             "autorSubTarea" => [
                 "type"=> "int",
@@ -194,10 +194,18 @@ class IntegradorTyHDBModel extends Model{
     private function initTareaCompartidaModel(){
         $fields=[
             "idTarea" => [
-                "type" => "INT"
+                "type" => "INT",
+                "null" => true,
+                "unasigned" => true
+            ],
+            "idSubTarea" => [
+                "type" => "INT",
+                "null" => true,
+                "unasigned" => true
             ],
             "idUsuario" => [
-                "type" => "INT"
+                "type" => "INT",
+                "unasigned" => true
             ],
             "tipoTareaCompartida" => [
                 "type" => "enum",
@@ -216,6 +224,12 @@ class IntegradorTyHDBModel extends Model{
                                     "cascade",
                                     "cascade",
                                     "fk_tareasCompartidas_idTarea");
+        $this->forge->addForeignKey("idSubTarea",
+                                    "SubTareas",
+                                    "idSubTarea",
+                                    "cascade",
+                                    "cascade",
+                                    "fk_tareasCompartidas_idSubTarea");
         $this->forge->addForeignKey("idUsuario",
                                     "Usuarios",
                                     "idUsuario",
@@ -229,5 +243,51 @@ class IntegradorTyHDBModel extends Model{
         ];
         $this->forge->addField($fields);
         $this->forge->createTable("TareasCompartidas", true, $attributes);
+    }
+    private function initComentarios(){
+        $fields=[
+            "idComentario" => [
+                "type" => "INT",
+                "unasigned" => true,
+                "auto_increment" => true
+            ],
+            "idSubTarea" => [
+                "type" => "INT",
+                "unasigned" => true
+            ],
+            "idUsuario" => [
+                "type" => "INT",
+                "unasigned" => true
+            ],
+            "comentario" => [
+                "type" => "varchar",
+                "constraint" => 50
+            ],
+            "estado" => [
+                "type" => "boolean",
+                "default" => true
+            ]
+        ];
+
+        $this->forge->addPrimaryKey("idComentario");
+        $this->forge->addForeignKey("idSubTarea",
+                                    "SubTareas",
+                                    "idSubTarea",
+                                    "cascade",
+                                    "cascade",
+                                    "fk_comentarios_idSubTarea");
+        $this->forge->addForeignKey("idUsuario",
+                                    "Usuarios",
+                                    "idUsuario",
+                                    "cascade",
+                                    "cascade",
+                                    "fk_comentarios_idUsuario");
+        $attributes = [
+            'engine' => 'InnoDB',
+            'charset' => 'utf8mb4',
+            'collate'=> 'utf8mb4_unicode_ci',
+        ];
+        $this->forge->addField($fields);
+        $this->forge->createTable("Comentarios", true, $attributes);
     }
 }
