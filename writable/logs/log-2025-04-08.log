@@ -1,0 +1,74 @@
+DEBUG - 2025-04-08 18:33:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-04-08 18:33:28 --> Error connecting to the database: mysqli_sql_exception: Unknown database 'tpintegrador' in C:\laragon\www\TpIntegrador\system\Database\MySQLi\Connection.php:201
+Stack trace:
+#0 C:\laragon\www\TpIntegrador\system\Database\MySQLi\Connection.php(201): mysqli->real_connect('127.0.0.1', 'root', Object(SensitiveParameterValue), 'TpIntegrador', 3306, '', 0)
+#1 C:\laragon\www\TpIntegrador\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 C:\laragon\www\TpIntegrador\system\Database\Database.php(72): CodeIgniter\Database\BaseConnection->initialize()
+#3 C:\laragon\www\TpIntegrador\system\Database\Config.php(111): CodeIgniter\Database\Database->loadForge(Object(CodeIgniter\Database\MySQLi\Connection))
+#4 C:\laragon\www\TpIntegrador\app\Models\TpIntegradorDB.php(10): CodeIgniter\Database\Config::forge()
+#5 C:\laragon\www\TpIntegrador\app\Controllers\Tareas.php(9): App\Models\TpIntegradorDB->__construct()
+#6 C:\laragon\www\TpIntegrador\system\CodeIgniter.php(933): App\Controllers\Tareas->getIndex()
+#7 C:\laragon\www\TpIntegrador\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Tareas))
+#8 C:\laragon\www\TpIntegrador\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\laragon\www\TpIntegrador\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#10 C:\laragon\www\TpIntegrador\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\laragon\www\TpIntegrador\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Unknown database 'tpintegrador' in C:\laragon\www\TpIntegrador\system\Database\MySQLi\Connection.php:246
+Stack trace:
+#0 C:\laragon\www\TpIntegrador\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 C:\laragon\www\TpIntegrador\system\Database\Database.php(72): CodeIgniter\Database\BaseConnection->initialize()
+#2 C:\laragon\www\TpIntegrador\system\Database\Config.php(111): CodeIgniter\Database\Database->loadForge(Object(CodeIgniter\Database\MySQLi\Connection))
+#3 C:\laragon\www\TpIntegrador\app\Models\TpIntegradorDB.php(10): CodeIgniter\Database\Config::forge()
+#4 C:\laragon\www\TpIntegrador\app\Controllers\Tareas.php(9): App\Models\TpIntegradorDB->__construct()
+#5 C:\laragon\www\TpIntegrador\system\CodeIgniter.php(933): App\Controllers\Tareas->getIndex()
+#6 C:\laragon\www\TpIntegrador\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Tareas))
+#7 C:\laragon\www\TpIntegrador\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\laragon\www\TpIntegrador\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#9 C:\laragon\www\TpIntegrador\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\laragon\www\TpIntegrador\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+DEBUG - 2025-04-08 19:38:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-04-08 19:40:35 --> ParseError: syntax error, unexpected token "}", expecting ";"
+[Method: GET, Route: tareas]
+in APPPATH\Controllers\Tareas.php on line 10.
+ 1 SYSTEMPATH\Autoloader\Autoloader.php(295): CodeIgniter\Autoloader\Autoloader->includeFile('C:\\laragon\\www\\TpIntegrador\\app\\Controllers\\Tareas.php')
+ 2 SYSTEMPATH\Autoloader\Autoloader.php(271): CodeIgniter\Autoloader\Autoloader->loadInNamespace('App\\Controllers\\Tareas')
+ 3 [internal function]: CodeIgniter\Autoloader\Autoloader->loadClass('App\\Controllers\\Tareas')
+ 4 SYSTEMPATH\Router\AutoRouterImproved.php(174): class_exists('\\App\\Controllers\\Tareas')
+ 5 SYSTEMPATH\Router\AutoRouterImproved.php(282): CodeIgniter\Router\AutoRouterImproved->searchFirstController()
+ 6 SYSTEMPATH\Router\Router.php(565): CodeIgniter\Router\AutoRouterImproved->getRoute('tareas', 'get')
+ 7 SYSTEMPATH\Router\Router.php(231): CodeIgniter\Router\Router->autoRoute('tareas')
+ 8 SYSTEMPATH\CodeIgniter.php(832): CodeIgniter\Router\Router->handle('tareas')
+ 9 SYSTEMPATH\CodeIgniter.php(455): CodeIgniter\CodeIgniter->tryToRouteIt(Object(CodeIgniter\Router\RouteCollection))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2025-04-08 19:41:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 19:56:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 19:57:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 19:58:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 20:45:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 20:52:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 20:53:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 20:57:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 20:58:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 20:59:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:00:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:02:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:03:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:03:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:04:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:05:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:05:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:06:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:06:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:06:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:09:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:10:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:10:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:11:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:11:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-04-08 21:12:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
