@@ -99,9 +99,10 @@ class Tarea extends BaseController{
             $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.descripcionTarea AS descripcion, tareas.prioridadTarea AS prioridad, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, tareas.autorTarea AS autor, "tarea" AS tarea_subtarea
                                         FROM tareas
                                         LEFT JOIN tareasCompartidas ON tareasCompartidas.idTarea=tareas.idTarea
-                                        WHERE tareas.idTarea='.session()->get("ids")[$id-1].' AND tareas.estadoTarea != "3"
-                                              AND (tareas.autorTarea = '.session()->get("usuario")["id"].'
-                                                   OR
+                                        WHERE tareas.idTarea='.session()->get("ids")[$id-1].'
+                                              AND (
+                                                   (tareas.autorTarea = '.session()->get("usuario")["id"].' AND tareas.tareaArchivada = 0)
+                                                  OR
                                                    (tareasCompartidas.estadoTareaCompartida="1" AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].')
                                                   )
                                         UNION
@@ -186,19 +187,36 @@ class Tarea extends BaseController{
                                 }elseif(!$tarea->update($idTarea,["estadoTarea"=>"3"])){
                                     return redirect()->to(base_url()."tarea/".$id)->with("mensajeTarea",["error"=>"","mensaje"=>"No se pudo modificar el estado de la Tarea<br>Intente nuevamente en unos minutos"]);
                                 }
-                                $arrayIds=session()->get("ids");
-                                array_splice($arrayIds,0,$id,array_slice($arrayIds,0,$id-1));
-                                session()->set("ids",$arrayIds);
-                                $auxArrayidsUser=session()->get("idsUsuario");
-                                $auxArrayidsUser[]=$idTarea;
-                                session()->set("idsUsuario",$auxArrayidsUser);
-                                return redirect()->to(base_url()."historial/".sizeof($auxArrayidsUser))->with("mensajeTarea",["success"=>"","mensaje"=>"Estado modificado con exito"]);
+                                return redirect()->to(base_url()."tarea/".$id)->with("mensajeTarea",["success"=>"","mensaje"=>"Estado modificado con exito"]);
                     }
                 }            
             }
         }
         catch(Error $e){
             return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error inesperado<br>Estamos trabajando en ello"]);
+        }
+    }
+
+    public function archivarTarea($id){
+        try{
+            if(!isset(session()->get("ids")[$id-1])){
+                return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Tarea no encontrada."]);
+            }
+            $idTarea=session()->get("ids")[$id-1];
+            $tarea=new TareaModel;
+            if(!$tarea->update($idTarea,["tareaArchivada"=>true])){
+                return redirect()->to("tarea/".$id)->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentar archivar la tarea.<br>Intente nuevamente en unos minutos."]);
+            }
+            $arrayIds=session()->get("ids");
+            array_splice($arrayIds,0,$id,array_slice($arrayIds,0,$id-1));
+            session()->set("ids",$arrayIds);
+            $auxArrayidsUser=session()->get("idsUsuario");
+            $auxArrayidsUser[]=$idTarea;
+            session()->set("idsUsuario",$auxArrayidsUser);
+            return redirect()->to(base_url()."historial/".sizeof($auxArrayidsUser))->with("mensajeTarea",["success"=>"","mensaje"=>"Tarea archivada con exito"]);
+        }
+        catch(Error $e){
+            return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error inesperado. Estamos trabajando en ello."]);
         }
     }
 

@@ -115,16 +115,13 @@ Class Inicio extends BaseController{
             $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.prioridadTarea AS prioridad, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, "tarea" AS tarea_subtarea
                                             FROM tareas
                                             LEFT JOIN tareasCompartidas ON tareasCompartidas.idTarea=tareas.idTarea
-                                            WHERE tareas.estadoTarea != "3"
-                                                  AND (tareas.autorTarea = '.session()->get("usuario")["id"].' 
-                                                      OR (tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].' AND tareasCompartidas.estadoTareaCompartida = "1")
-                                                      )
+                                            WHERE    (tareas.autorTarea = '.session()->get("usuario")["id"].' AND tareas.tareaArchivada = 0)
+                                                  OR (tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].' AND tareasCompartidas.estadoTareaCompartida = "1")
                                             UNION
                                                 SELECT subTareas.idSubTarea AS id, subTareas.descripcionSubTarea AS titulo, subTareas.prioridadSubTarea AS prioridad, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, "" AS fechaRecordatorio, subTareas.colorSubTarea AS color, "subtarea" AS tarea_subtarea
                                                 FROM subTareas
                                                 LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea=subTareas.idSubTarea
-                                                WHERE subTareas.estadoSubTarea != "3"
-                                                      AND tareasCompartidas.estadoTareaCompartida="1"
+                                                WHERE tareasCompartidas.estadoTareaCompartida="1"
                                                       AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].'
                                             ';
             $sql.=$this->getOrden();
@@ -149,7 +146,7 @@ Class Inicio extends BaseController{
             $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.prioridadTarea AS prioridad, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, "tarea" AS tarea_subtarea
                                             FROM tareas
                                             WHERE tareas.autorTarea = '.session()->get("usuario")["id"].'
-                                                  AND tareas.estadoTarea != 3
+                                                  AND tareas.tareaArchivada = 0
                                             ';
             $sql.=$this->getOrden();
             $query   = $db->query($sql);
@@ -174,15 +171,13 @@ Class Inicio extends BaseController{
             $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.prioridadTarea AS prioridad, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, "tarea" AS tarea_subtarea
                                         FROM tareas
                                         LEFT JOIN tareasCompartidas ON tareasCompartidas.idTarea=tareas.idTarea
-                                        WHERE tareas.estadoTarea != "3"
-                                              AND tareasCompartidas.estadoTareaCompartida = "1"
+                                        WHERE tareasCompartidas.estadoTareaCompartida = "1"
                                               AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].'
                                         UNION
                                             SELECT subTareas.idSubTarea AS id, subTareas.descripcionSubTarea AS titulo, subTareas.prioridadSubTarea AS prioridad, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, "" AS fechaRecordatorio, subTareas.colorSubTarea AS color, "subtarea" AS tarea_subtarea
                                             FROM subTareas
                                             LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea=subTareas.idSubTarea
-                                            WHERE subTareas.estadoSubTarea != "3"
-                                                  AND tareasCompartidas.estadoTareaCompartida = "1"
+                                            WHERE tareasCompartidas.estadoTareaCompartida = "1"
                                                   AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].'
                                         ';
             $sql.=$this->getOrden();
@@ -209,7 +204,7 @@ Class Inicio extends BaseController{
             $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.prioridadTarea AS prioridad, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, "tarea" AS tarea_subtarea
                                             FROM tareas
                                             WHERE tareas.autorTarea = '.session()->get("usuario")["id"].'
-                                                  AND tareas.estadoTarea = 3
+                                                  AND tareas.tareaArchivada = 1
                                             ';
             $sql.=$this->getOrden();
             $query   = $db->query($sql);

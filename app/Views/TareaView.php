@@ -74,7 +74,11 @@
                                 <?php if($tareaOsubtarea["estado"]!=3){?>
                                 <li>
                                     <a class="dropdown-item text-reset text-decoration-none" href="<?php  echo base_url()."tarea/estadotarea/".$idTarea;?>"><?php if($tareaOsubtarea["estado"] == "1") echo "Empezar";elseif($tareaOsubtarea["estado"] == "2") echo "Finalizar";?></a>
-                                </li><?php }?>
+                                </li><?php }elseif($tareaOsubtarea["estado"]==3 && $tareaOsubtarea["autor"]==session()->get("usuario")["id"]){?>
+                                <li>
+                                    <a class="dropdown-item text-reset text-decoration-none" href="<?php  echo base_url()."tarea/archivartarea/".$idTarea;?>">Archivar</a>
+                                </li>
+                               <?php }?>
                             </ul>
                         </div>
                         
@@ -225,7 +229,7 @@
                     <?php $mensaje=session()->getFlashdata("mensaje"); ?>
                     <h5 class="dark m-0 ms-4 border-bottom border-<?php if(isset($mensaje["success"]))echo "success";elseif(isset($mensaje["success"])) echo "danger";?>"><?php if(isset($mensaje["mensaje"])) echo $mensaje["mensaje"];?></h5>
                 </div>
-                <?php if($estadoTarea<3){?>
+                <?php if(isset($estadoTarea))if($estadoTarea<3){?>
                     <button type="button" id="botonNewSubTarea" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newSubTareaModal">Nueva subTarea</button>
                     <div class="modal fade" id="newSubTareaModal" tabindex="-1" aria-labelledby="newSubTareaModalLabel" aria-hidden="true">
                         <div class="modal-dialog">

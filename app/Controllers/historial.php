@@ -27,7 +27,7 @@ class Historial extends BaseController{
                                         FROM tareas
                                         LEFT JOIN tareasCompartidas ON tareasCompartidas.idTarea=tareas.idTarea
                                         WHERE tareas.idTarea = '.session()->get("idsUsuario")[$id-1].'
-                                              AND tareas.estadoTarea = 3
+                                              AND tareas.tareaArchivada = 1
                                               AND tareas.autorTarea = '.session()->get("usuario")["id"].'
                                         UNION
                                             SELECT subTareas.idSubTarea AS id, "" AS titulo, subTareas.descripcionSubTarea AS descripcion, subTareas.prioridadSubTarea AS prioridad, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, "" AS fechaRecordatorio, subTareas.colorSubTarea AS color, subTareas.autorSubTarea AS autor, "subtarea" AS tarea_subtarea

@@ -99,6 +99,10 @@ class IntegradorTyHDBModel extends Model{
                 "constraint" => ["#6f3c1e5c","#7820695c","#4016645c","#2805555c","#276d345c","#035f785c"],
                 "default"=> "#6f3c1e5c"
             ],
+            "tareaArchivada" => [
+                "type" => "boolean",
+                "default" => false
+            ],
             "autorTarea" => [
                 "type"=> "int",
                 "unasigned" => true

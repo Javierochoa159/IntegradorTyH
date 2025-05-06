@@ -8,7 +8,7 @@ class TareaModel extends Model{
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
-    protected $allowedFields = ['tituloTarea', 'descripcionTarea','prioridadTarea','estadoTarea','fechaVencimientoTarea','fechaRecordatorioTarea','colorTarea','autorTarea'];
+    protected $allowedFields = ['tituloTarea', 'descripcionTarea','prioridadTarea','estadoTarea','fechaVencimientoTarea','fechaRecordatorioTarea','colorTarea','tareaArchivada','autorTarea'];
     protected bool $updateOnlyChanged = true;
     protected $useTimestamps = false;
     protected $dateFormat = 'datetime';
