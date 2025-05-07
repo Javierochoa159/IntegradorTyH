@@ -176,7 +176,7 @@
                                 <div class="fechaEstadoTarea">
                                     <div class="d-flex">
                                         <p class="dark frt"><?php if($tarea["fechaRecordatorio"]!=null) echo substr($tarea["fechaRecordatorio"],0,-3)?></p>
-                                        <p class="dark fvt <?php if(date("U")-date_format(date_create($tarea["fechaVencimiento"]),"U")<=604800) echo "fechaVence";?>"><?= substr($tarea["fechaVencimiento"],0,-3)?></p>
+                                        <p class="dark fvt <?php if($tarea["fechaVencimiento"]!=null)if(date("U")-date_format(date_create($tarea["fechaVencimiento"]),"U")<=604800) echo "fechaVence";?>"><?php if($tarea["fechaVencimiento"]!=null)if(date_format(date_create($tarea["fechaVencimiento"]),"U")>0) echo substr($tarea["fechaVencimiento"],0,-3);?></p>
                                     </div>
                                     <p class="dark et"><?php 
                                         switch($tarea["estado"]) {case "1": echo "Definida";break; case "2": echo "En proceso";break; case "3": echo "Finalizada";}
