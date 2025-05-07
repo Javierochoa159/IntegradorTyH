@@ -218,7 +218,12 @@ select.light{
     border: solid 0.01rem #6c757d;
     border-radius: 7px;
 }
-
+.ordenPagina button.dark:hover, .ordenPagina button.dark:focus{
+    border: solid 0.01rem white !important;
+}
+.ordenPagina button.light:hover, .ordenPagina button.light:focus{
+    border: solid 0.01rem black !important;
+}
 #subTareasDiv.list{
     min-height: 30vh;
     padding: 0 10px 0 10px;
