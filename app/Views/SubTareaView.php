@@ -45,7 +45,12 @@
                 </div>
                 <div class="col-11 d-flex justify-content-center">
                     <?php if(isset($subTarea_comentarios)) foreach($subTarea_comentarios as $subTareaOcomentario) {
-                        if($subTareaOcomentario["subtarea_comentario"]=="subtarea"){?>
+                        if($subTareaOcomentario["subtarea_comentario"]=="subtarea"){
+                            $vicibilidadSubTarea["autor"]=$subTareaOcomentario["autor"];
+                            $vicibilidadSubTarea["estado"]=$subTareaOcomentario["estado"];
+                            $vicibilidadSubTarea["tipoTC"]=$subTareaOcomentario["tipoTC"];
+                            
+                            ?>
                     <div class="subTarea dark col-10 prioriSubTarea_<?= $subTareaOcomentario["prioridad"]?>" style="background-color:<?= $subTareaOcomentario["color"]?>;">
                         <div class="descripcionSubTarea p-2 mx-2"><p class="dark"><?= $subTareaOcomentario["descripcion"]?></p></div>
                         <div class="pieSubTarea">
@@ -85,7 +90,8 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form id="modSubTarea" action="<?= base_url()."subtarea/modsubtarea/".$idSubTarea?>" method="post">
+                                <form id="modSubTarea" action="<?php if($subTareaOcomentario["autor"]==session()->get("usuario")["id"] || $subTareaOcomentario["tipoTC"]==3) echo base_url("subtarea/modsubtarea/".$idSubTarea);elseif($subTareaOcomentario["autor"]!=session()->get("usuario")["id"] || $subTareaOcomentario["tipoTC"]==2) echo base_url("subtarea/anexsubtarea/".$idSubTarea);?>" method="post">
+                                <?php if($subTareaOcomentario["autor"]==session()->get("usuario")["id"] || $subTareaOcomentario["tipoTC"]==3){?>
                                     <div class="mb-3">
                                         <label for="descripcionSubTarea" class="col-form-label">Descripcion</label>
                                         <textarea class="form-control" name="descripcionSubTarea" id="descripcionSubTarea"><?php if(old("descripcionSubTarea")!=null) echo old("descripcionSubTarea");else echo $subTareaOcomentario["descripcion"]?></textarea>
@@ -139,6 +145,19 @@
                                             </div>
                                         </div>
                                     </div>
+                                <?php }elseif($subTareaOcomentario["autor"]!=session()->get("usuario")["id"] && $subTareaOcomentario["tipoTC"]==2){?>
+                                    <div class="mb-3">
+                                        <label for="descripcionViejaSubTarea" class="col-form-label">Descripcion</label>
+                                        <textarea class="form-control" id="descripcionViejaSubTarea" disabled><?= $subTareaOcomentario["descripcion"]?></textarea>
+                                        <label for="descripcionSubTarea" class="col-form-label">Anexar</label>
+                                        <textarea class="form-control" name="descripcionSubTarea" id="descripcionSubTarea"><?php if(old("descripcionSubTarea")!=null) echo old("descripcionSubTarea");?></textarea>
+                                        <p class="mb-0">
+                                            <?php if(isset(validation_errors()["descripcionSubTarea"])){
+                                                    echo str_replace("descripcionSubTarea","Descripcion",validation_errors()["descripcionSubTarea"]);
+                                            }?>
+                                        </p>
+                                    </div>
+                                <?php }?>
                                 </form>
                             </div>
                             <div class="modal-footer">

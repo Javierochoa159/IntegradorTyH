@@ -46,9 +46,9 @@
                 <div class="col-11 d-flex justify-content-center">
                     <?php $fechaTarea;if(isset($tarea_subTareas))foreach($tarea_subTareas as $tareaOsubtarea) {
                         if($tareaOsubtarea["tarea_subtarea"]=="tarea"){
-                            $vicibilidadTarea["autor"]=$tareaOsubtarea["autor"];
-                            $vicibilidadTarea["estado"]=$tareaOsubtarea["estado"];
-                            $vicibilidadTarea["estado"]=$tareaOsubtarea["tipoTC"];
+                            $visibilidadTarea["autor"]=$tareaOsubtarea["autor"];
+                            $visibilidadTarea["estado"]=$tareaOsubtarea["estado"];
+                            $visibilidadTarea["tipoTC"]=$tareaOsubtarea["tipoTC"];
                             
                         ?>
                     <div class="tarea col-10 prioriTarea_<?= $tareaOsubtarea["prioridad"]?>" style="background-color:<?= $tareaOsubtarea["color"]?>;">

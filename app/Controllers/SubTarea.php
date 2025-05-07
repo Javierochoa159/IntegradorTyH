@@ -30,7 +30,7 @@ class SubTarea extends BaseController{
     private function todosLosComentarios($id){
         try{
             $db = \Config\Database::connect();
-            $sql='SELECT subTareas.idSubTarea AS id, subTareas.descripcionSubTarea AS descripcion, subTareas.prioridadSubTarea AS prioridad, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, subTareas.colorSubTarea AS color, subTareas.autorSubTarea AS autor, "subtarea" AS subtarea_comentario
+            $sql='SELECT subTareas.idSubTarea AS id, subTareas.descripcionSubTarea AS descripcion, subTareas.prioridadSubTarea AS prioridad, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, subTareas.colorSubTarea AS color, subTareas.autorSubTarea AS autor, CASE WHEN tareasCompartidas.tipoTareaCompartida IS NOT NULL THEN tareasCompartidas.tipoTareaCompartida ELSE NULL END AS tipoTC, "subtarea" AS subtarea_comentario
                                         FROM subTareas
                                         LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea=subTareas.idSubTarea
                                         WHERE subTareas.idSubTarea = '.$id.'
@@ -40,7 +40,7 @@ class SubTarea extends BaseController{
                                                       AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].')
                                                     )
                                         UNION
-                                            SELECT comentarios.idComentario AS id, comentarios.comentario AS descripcion, "" AS prioridad, "" AS estado, "" AS fechaVencimiento, "" AS color, comentarios.idUsuario AS autor, "comentario" AS subtarea_comentario
+                                            SELECT comentarios.idComentario AS id, comentarios.comentario AS descripcion, "" AS prioridad, "" AS estado, "" AS fechaVencimiento, "" AS color, comentarios.idUsuario AS autor, NULL AS tipoTC, "comentario" AS subtarea_comentario
                                             FROM comentarios
                                             LEFT JOIN subTareas ON subTareas.idSubTarea= comentarios.idSubTarea
                                             LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea= comentarios.idSubTarea
@@ -65,9 +65,14 @@ class SubTarea extends BaseController{
 
     public function newComentario(){
         try{
-            if(!isset(session()->get("idsTarea")[$this->request->getPost("idSubTarea")-1])){
+            if(!isset(session()->get("idsTarea")[$this->request->getPost("idSubTarea")-1]) && !isset(session()->get("subTareaShare")[$this->request->getPost("idSubTarea")])){
                 return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error inesperado al momento de crear un Comentario<br>Intentelo nuevamente en unos minutos"]);
             }else{
+                if(isset(session()->get("idsTarea")[$this->request->getPost("idSubTarea")-1])){
+                    $idSubTarea=session()->get("idsTarea")[$this->request->getPost("idSubTarea")-1];
+                }else{
+                    $idSubTarea=session()->get("subTareaShare")[$this->request->getPost("idSubTarea")];
+                }
                 helper("spanishErrors_helper");
                 $post=$this->request->getPost(["comentarioComentario","idSubTarea"]);
                 $validacion = service('validation');
@@ -80,7 +85,7 @@ class SubTarea extends BaseController{
                     return redirect()->to(base_url()."subtarea/".$post["idSubTarea"])->withInput();
                 }else{
                     $sqlIn=[
-                        "idSubTarea"=>session()->get("idsTarea")[$post["idSubTarea"]-1],
+                        "idSubTarea"=>$idSubTarea,
                         "idUsuario"=> session()->get("usuario")["id"],
                         "comentario"=>$post["comentarioComentario"]
                     ];
@@ -100,7 +105,14 @@ class SubTarea extends BaseController{
 
     public function modSubTarea($id){
         try{
-            if(isset(session()->get("idsTarea")[$id-1])){
+            if(!isset(session()->get("idsTarea")[$id-1]) && !isset(session()->get("subTareaShare")[$id])){
+                return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error inesperado. Estamos trabajando en ello."]);
+            }else{
+                if(isset(session()->get("idsTarea")[$id-1])){
+                    $idSubTarea=session()->get("idsTarea")[$id-1];
+                }else{
+                    $idSubTarea=session()->get("subTareaShare")[$id];
+                }
                 helper("spanishErrors_helper");
                 $post=$this->request->getPost(["descripcionSubTarea","prioridadSubTarea","colorSubTarea"]);
                 $validacion = service('validation');
@@ -110,7 +122,7 @@ class SubTarea extends BaseController{
                 $validacion->setRules($reglas,spanishErrorMessages($reglas));
                 if (!$validacion->withRequest($this->request)->run())
                 {
-                    return redirect()->to(base_url()."tarea/".$id)->withInput();
+                    return redirect()->to(base_url()."subtarea/".$id)->withInput();
                 }
                 $sqlIn=[
                     "descripcionSubTarea"=>$post["descripcionSubTarea"],
@@ -118,18 +130,57 @@ class SubTarea extends BaseController{
                     "colorSubTarea"=>$post["colorSubTarea"]
                 ];
                 $subTarea=new SubTareaModel();
-                if($subTarea->update(session()->get("idsTarea")[$id-1],$sqlIn)){
-                    $subTarea=null;
-                    return redirect()->to(base_url().'subtarea/'.$id)->with("mensaje",["success"=> "", "mensaje" => "SubTarea modificada!"]);
-                }else{
+                if(!$subTarea->update($idSubTarea,$sqlIn)){
                     $subTarea=null;
                     return redirect()->to(base_url().'subtarea/'.$id)->with("mensaje",["error"=> "", "mensaje"=> "Error al modificar la subTarea<br>Intente nuevamente en unos minutos"]);
                 }
+                $subTarea=null;
+                return redirect()->to(base_url().'subtarea/'.$id)->with("mensaje",["success"=> "", "mensaje" => "SubTarea modificada!"]);
             }
-            return redirect()->to(base_url().'subtarea/'.$id)->with("mensaje",["error"=> "", "mensaje"=> "Error al modificar la subTarea<br>Intente nuevamente en unos minutos"]);
         }
         catch(Error $e){
             return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error inesperado<br>Estamos trabajando en ello"]);
+        }
+    }
+    public function anexarSubTarea($id){
+        try{
+            if(!isset(session()->get("idsTarea")[$id-1]) && !isset(session()->get("subTareaShare")[$id])){
+                return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error inesperado. Estamos trabajando en ello."]);
+            }else{
+                if(isset(session()->get("idsTarea")[$this->request->getPost("idSubTarea")-1])){
+                    $idSubTarea=session()->get("idsTarea")[$this->request->getPost("idSubTarea")-1];
+                }else{
+                    $idSubTarea=session()->get("subTareaShare")[$this->request->getPost("idSubTarea")];
+                }
+                helper("spanishErrors_helper");
+                $post=$this->request->getPost(["descripcionSubTarea"]);
+                $validacion = service('validation');
+                $reglas=[
+                    "descripcionSubTarea" =>"required|valid_alphanum_space_punct|max_length[255]|min_length[10]"
+                ];
+                $validacion->setRules($reglas,spanishErrorMessages($reglas));
+                if (!$validacion->withRequest($this->request)->run())
+                {
+                    return redirect()->to(base_url()."subtarea/".$id)->withInput();
+                }
+                $subTarea=new SubTareaModel();
+                $viejaDesc=$subTarea->select("descripcionSubTarea")->find($idSubTarea);
+                if(!isset($viejaDesc)){
+                    return redirect()->to(base_url().'subtarea/'.$id)->with("mensaje",["error"=> "", "mensaje"=> "Error al modificar la subTarea<br>Intente nuevamente en unos minutos"]);
+                }
+                if(empty($viejaDesc)){
+                    return redirect()->to(base_url().'subtarea/'.$id)->with("mensaje",["error"=> "", "mensaje"=> "Error al modificar la subTarea<br>Intente nuevamente en unos minutos"]);
+                }
+                if(!$subTarea->update($idSubTarea,["descripcionSubTarea"=>$post["descripcionSubTarea"]."<br>".$viejaDesc["descripcionSubTarea"]])){
+                    $subTarea=null;
+                    return redirect()->to(base_url().'subtarea/'.$id)->with("mensaje",["error"=> "", "mensaje"=> "Error al modificar la subTarea<br>Intente nuevamente en unos minutos"]);
+                }
+                $subTarea=null;
+                return redirect()->to(base_url().'subtarea/'.$id)->with("mensaje",["success"=> "", "mensaje" => "SubTarea modificada!"]);
+            }
+        }
+        catch(Error $e){
+            return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error inesperado. Estamos trabajando en ello"]);
         }
     }
 
@@ -304,9 +355,9 @@ class SubTarea extends BaseController{
                         }
                         $tc=null;
                         $subTarea=new SubTareaModel();
-                        $res=$subTarea->update($idSubTarea[0]["idSubTarea"],["responsableSubTarea"=>$idSubTarea[0]["idUsuario"]]);
+                        $res=$subTarea->update($idSubTarea["idSubTarea"],["responsableSubTarea"=>$idSubTarea["idUsuario"]]);
                         while(!$res){
-                            $res=$subTarea->update($idSubTarea[0]["idSubTarea"],["responsableSubTarea"=>$idSubTarea[0]["idUsuario"]]);
+                            $res=$subTarea->update($idSubTarea["idSubTarea"],["responsableSubTarea"=>$idSubTarea["idUsuario"]]);
                         }
                         $subTarea=null;
                         return redirect()->to(base_url()."inicio")->with("mensaje",["success"=>"","mensaje"=>"La invitacion se proceso con exito"]);
@@ -317,9 +368,9 @@ class SubTarea extends BaseController{
                         }
                         $tc=null;
                         $subTarea=new SubTareaModel();
-                        $res=$subTarea->update($idSubTarea[0]["idSubTarea"],["responsableSubTarea"=>$idSubTarea[0]["idUsuario"]]);
+                        $res=$subTarea->update($idSubTarea["idSubTarea"],["responsableSubTarea"=>$idSubTarea["idUsuario"]]);
                         while(!$res){
-                            $res=$subTarea->update($idSubTarea[0]["idSubTarea"],["responsableSubTarea"=>$idSubTarea[0]["idUsuario"]]);
+                            $res=$subTarea->update($idSubTarea["idSubTarea"],["responsableSubTarea"=>$idSubTarea["idUsuario"]]);
                         }
                         $subTarea=null;
                         return redirect()->to(base_url()."inicio")->with("mensaje",["success"=>"","mensaje"=>"La invitacion se proceso con exito"]);

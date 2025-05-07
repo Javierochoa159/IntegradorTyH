@@ -36,6 +36,7 @@ class Tarea extends BaseController{
                 if(isset($idAutorT)){
                     if(!empty($idAutorT)){
                         if($idAutorT["autorTarea"]==session()->get("usuario")["id"]){
+                            helper("spanishErrors_helper");
                             $post=$this->request->getPost(["descripcionSubTarea","comentarioSubTarea","prioridadSubTarea","colorSubTarea","responsableSubTarea","fechaVencimientoSubTarea","idTarea"]);
                             $validacion = service('validation');
                             $reglas=[
@@ -127,7 +128,7 @@ class Tarea extends BaseController{
                 "idSubTarea"=>$idSubTarea
             ];
             $tc=new TareaCompartidaModel();
-            $res=$tc->select("idTareaCompartida, tipoTareaCompartida, estadoTareaCompartida")->where("idTarea=".session()->get("ids")[$idTarea]." AND idUsuario=".$idTarea." AND idSubTarea=".$idSubTarea)->find();
+            $res=$tc->select("idTareaCompartida, tipoTareaCompartida, estadoTareaCompartida")->where("idTarea=".session()->get("ids")[$idTarea-1]." AND idUsuario=".$idUser." AND idSubTarea=".$idSubTarea)->find();
             if(!isset($res)){
                 $tc=null;
                 return 0;
@@ -157,7 +158,7 @@ class Tarea extends BaseController{
                 $email->setReplyTo("respuestas@inbox.mailtrap.io");
                 $email->setTo($emailUser);
                 $email->setSubject("Responsable de SubTarea");
-                $email->setMessage("Se te ha asignado como responsable en una subtarea.<br><a href='".base_url()."/subtarea/procesarshare/".$idTC."/1'>Aceptar</a><a href='".base_url()."/subtarea/procesarshare/".$idTC."/2'>Rechazar</a>");
+                $email->setMessage("Se te ha asignado como responsable en una subtarea.<br><a href='".base_url()."/subtarea/procesarresponsable/".$idTC."/1'>Aceptar</a><a href='".base_url()."/subtarea/procesarresponsable/".$idTC."/2'>Rechazar</a>");
                 $emailRes=$email->send();
                 while(!$emailRes){
                     $emailRes=$email->send();

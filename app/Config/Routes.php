@@ -44,6 +44,7 @@ $routes->get('/subtarea/(:num)', 'SubTarea::index/$1');
 $routes->post('/subtarea/newcomentario', 'SubTarea::newComentario');
 $routes->get('/subtarea/estadosubtarea/(:num)', 'SubTarea::setEstadoSubTarea/$1');
 $routes->post('/subtarea/modsubtarea/(:num)', 'SubTarea::modSubTarea/$1');
+$routes->post('/subtarea/anexsubtarea/(:num)', 'SubTarea::anexSubTarea/$1');
 $routes->post('/subtarea/sharesubtarea', 'SubTarea::shareSubTarea');
 $routes->get('/subtarea/procesarshare/(:num)/(:num)', 'SubTarea::procesarShare/$1/$2');
 $routes->get('/subtarea/procesarresponsable/(:num)/(:num)', 'SubTarea::procesarResponsable/$1/$2');
