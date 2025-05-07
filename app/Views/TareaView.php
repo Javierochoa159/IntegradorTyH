@@ -45,14 +45,19 @@
                 </div>
                 <div class="col-11 d-flex justify-content-center">
                     <?php $fechaTarea;if(isset($tarea_subTareas))foreach($tarea_subTareas as $tareaOsubtarea) {
-                        if($tareaOsubtarea["tarea_subtarea"]=="tarea"){?>
+                        if($tareaOsubtarea["tarea_subtarea"]=="tarea"){
+                            $vicibilidadTarea["autor"]=$tareaOsubtarea["autor"];
+                            $vicibilidadTarea["estado"]=$tareaOsubtarea["estado"];
+                            $vicibilidadTarea["estado"]=$tareaOsubtarea["tipoTC"];
+                            
+                        ?>
                     <div class="tarea col-10 prioriTarea_<?= $tareaOsubtarea["prioridad"]?>" style="background-color:<?= $tareaOsubtarea["color"]?>;">
                         <div class="tituloTarea p-2 mx-2"><h3 class="dark m-0"><?= $tareaOsubtarea["titulo"]?></h3></div>
                         <div class="descripcionTarea p-2 mx-2"><p class="dark"><?= $tareaOsubtarea["descripcion"]?></p></div>
                         <div class="pieTarea">
                             <p class="dark frt"><?php if($tareaOsubtarea["fechaRecordatorio"]!=null) echo substr($tareaOsubtarea["fechaRecordatorio"],0,-3)?></p>
                             <p class="dark fvt"><?= substr($tareaOsubtarea["fechaVencimiento"],0,-3)?><?php $fechaTarea=$tareaOsubtarea["fechaVencimiento"]?></p>
-                            <p class="dark et"><?php $estadoTarea=$tareaOsubtarea["estado"];
+                            <p class="dark et"><?php
                                 switch($tareaOsubtarea["estado"]){
                                     case 1: echo "Definida";break;
                                     case 2: echo "En proceso";break;
@@ -63,9 +68,11 @@
                         <div class="dropdown optTarea dark">
                             <button class="btn dropdown-toggle dark" type="button" data-bs-toggle="dropdown" aria-expanded="false"><img src="https://img.icons8.com/?size=100&id=7m1CoJ6JRUqG&format=png&color=000000" alt="options"></button>
                             <ul class="dropdown-menu dark">
+                                <?php if($tareaOsubtarea["tipoTC"]>=2){?>
                                 <li>
                                     <p id="botonModTarea" class="dropdown-item text-reset text-decoration-none mb-0" data-bs-toggle="modal" data-bs-target="#modTareaModal">Modificar</p>
                                 </li>
+                                <?php }?>
                                 <?php if($tareaOsubtarea["estado"]!=3 && $tareaOsubtarea["autor"]==session()->get("usuario")["id"]){?>
                                 <li>
                                     <p id="botonCompartirTarea" class="dropdown-item text-reset text-decoration-none mb-0" data-bs-toggle="modal" data-bs-target="#compartirTareaModal">Compartir</p>
@@ -74,7 +81,8 @@
                                 <?php if($tareaOsubtarea["estado"]!=3){?>
                                 <li>
                                     <a class="dropdown-item text-reset text-decoration-none" href="<?php  echo base_url()."tarea/estadotarea/".$idTarea;?>"><?php if($tareaOsubtarea["estado"] == "1") echo "Empezar";elseif($tareaOsubtarea["estado"] == "2") echo "Finalizar";?></a>
-                                </li><?php }elseif($tareaOsubtarea["estado"]==3 && $tareaOsubtarea["autor"]==session()->get("usuario")["id"]){?>
+                                </li>
+                                <?php }elseif($tareaOsubtarea["estado"]==3 && $tareaOsubtarea["autor"]==session()->get("usuario")["id"]){?>
                                 <li>
                                     <a class="dropdown-item text-reset text-decoration-none" href="<?php  echo base_url()."tarea/archivartarea/".$idTarea;?>">Archivar</a>
                                 </li>
@@ -91,83 +99,97 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form id="modTarea" action="<?= base_url($urlTarea."/modtarea/".$idTarea)?>" method="post">
-                                    <div class="mb-3">
-                                        <label for="tituloTarea" class="col-form-label">Titulo</label>
-                                        <input type="text" class="form-control" name="tituloTarea" id="tituloTarea" <?php if(old("tituloTarea")!=null) echo "value='".old("tituloTarea")."'";else echo "value='".$tareaOsubtarea["titulo"]."'"?>>
-                                        <p class="mb-0">
-                                            <?php if(isset(validation_errors()["tituloTarea"])){
-                                                    echo str_replace("tituloTarea","Titulo",validation_errors()["tituloTarea"]);
-                                            }?>
-                                        </p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="descripcionTarea" class="col-form-label">Descripcion</label>
-                                        <textarea class="form-control" name="descripcionTarea" id="descripcionTarea"><?php if(old("descripcionTarea")!=null) echo old("descripcionTarea");else echo $tareaOsubtarea["descripcion"]?></textarea>
-                                        <p class="mb-0">
-                                            <?php if(isset(validation_errors()["descripcionTarea"])){
-                                                    echo str_replace("descripcionTarea","Descripcion",validation_errors()["descripcionTarea"]);
-                                            }?>
-                                        </p>
-                                    </div>
-                                    <div class="mb-3 d-flex justify-content-around">
-                                        <div class="col-5 d-flex">
-                                            <label for="prioridadTarea" class="col-form-label">Prioridad </label>
-                                            <select class="ms-2" name="prioridadTarea" id="prioridadTarea" <?php if(old("prioridadTarea")!=null) echo "value='".old("prioridadTarea")."'";else echo "value='".$tareaOsubtarea["prioridad"]."'"?>>
-                                                <option value="1">Baja</option>
-                                                <option value="2">Normal</option>
-                                                <option value="3">Alta</option>
-                                            </select>
+                                <form id="modTarea" action="<?php if($tareaOsubtarea["autor"]==session()->get("usuario")["id"] || $tareaOsubtarea["tipoTC"]==3) echo base_url($urlTarea."/modtarea/".$idTarea);elseif($tareaOsubtarea["autor"]!=session()->get("usuario")["id"] || $tareaOsubtarea["tipoTC"]==2) echo base_url("tarea/anextarea/".$idTarea);?>" method="post">
+                                    <?php if($tareaOsubtarea["autor"]==session()->get("usuario")["id"] || $tareaOsubtarea["tipoTC"]==3){?>
+                                        <div class="mb-3">
+                                            <label for="tituloTarea" class="col-form-label">Titulo</label>
+                                            <input type="text" class="form-control" name="tituloTarea" id="tituloTarea" <?php if(old("tituloTarea")!=null) echo "value='".old("tituloTarea")."'";else echo "value='".$tareaOsubtarea["titulo"]."'"?>>
+                                            <p class="mb-0">
+                                                <?php if(isset(validation_errors()["tituloTarea"])){
+                                                        echo str_replace("tituloTarea","Titulo",validation_errors()["tituloTarea"]);
+                                                }?>
+                                            </p>
                                         </div>
-                                        <?php $colores=["#6f3c1e5c","#7820695c","#4016645c","#2805555c","#276d345c","#035f785c"]?>
-                                        <div class="col-5 d-flex">
-                                            <label for="colorTarea" class="col-form-label">Color </label>
-                                            <div class="dropdown colorTarea">
-                                                <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"><div style="background-color:<?= $tareaOsubtarea["color"]?>;"></div></button>
-                                                <ul class="dropdown-menu dark">
-                                                    <li class="labelColorF" onClick="clickLabelColorTarea(event)">
-                                                        <label for="colorTarea1" class="dropdown-item" data-value="<?= $colores[0]?>" style="background-color: <?= $colores[0]?>"></label>
-                                                        <input type="radio" name="colorTarea" id="colorTarea1" value="<?= $colores[0]?>" <?php if($tareaOsubtarea["color"]==$colores[0])echo "checked";?> hidden onChange="checkColorTarea(event)">
-                                                    </li>
-                                                    <li onClick="clickLabelColorTarea(event)">
-                                                        <label for="colorTarea2" class="dropdown-item" data-value="<?= $colores[1]?>" style="background-color: <?= $colores[1]?>"></label>
-                                                        <input type="radio" name="colorTarea" id="colorTarea2" value="<?= $colores[1]?>" <?php if($tareaOsubtarea["color"]==$colores[1])echo "checked";?> hidden onChange="checkColorTarea(event)">
-                                                    </li>
-                                                    <li onClick="clickLabelColorTarea(event)">
-                                                        <label for="colorTarea3" class="dropdown-item" data-value="<?= $colores[2]?>" style="background-color: <?= $colores[2]?>"></label>
-                                                        <input type="radio" name="colorTarea" id="colorTarea3" value="<?= $colores[2]?>" <?php if($tareaOsubtarea["color"]==$colores[2])echo "checked";?> hidden onChange="checkColorTarea(event)">
-                                                    </li>
-                                                    <li onClick="clickLabelColorTarea(event)">
-                                                        <label for="colorTarea4" class="dropdown-item" data-value="<?= $colores[3]?>" style="background-color: <?= $colores[3]?>"></label>
-                                                        <input type="radio" name="colorTarea" id="colorTarea4" value="<?= $colores[3]?>" <?php if($tareaOsubtarea["color"]==$colores[3])echo "checked";?> hidden onChange="checkColorTarea(event)">
-                                                    </li>
-                                                    <li onClick="clickLabelColorTarea(event)">
-                                                        <label for="colorTarea5" class="dropdown-item" data-value="<?= $colores[4]?>" style="background-color: <?= $colores[4]?>"></label>
-                                                        <input type="radio" name="colorTarea" id="colorTarea5" value="<?= $colores[4]?>" <?php if($tareaOsubtarea["color"]==$colores[4])echo "checked";?> hidden onChange="checkColorTarea(event)">
-                                                    </li>
-                                                    <li class="labelColorL" onClick="clickLabelColorTarea(event)">
-                                                        <label for="colorTarea6" class="dropdown-item" data-value="<?= $colores[5]?>" style="background-color: <?= $colores[5]?>"></label>
-                                                        <input type="radio" name="colorTarea" id="colorTarea6" value="<?= $colores[5]?>" <?php if($tareaOsubtarea["color"]==$colores[5])echo "checked";?> hidden onChange="checkColorTarea(event)">
-                                                    </li>
-                                                </ul>
+                                        <div class="mb-3">
+                                            <label for="descripcionTarea" class="col-form-label">Descripcion</label>
+                                            <textarea class="form-control" name="descripcionTarea" id="descripcionTarea"><?php if(old("descripcionTarea")!=null) echo old("descripcionTarea");else echo $tareaOsubtarea["descripcion"]?></textarea>
+                                            <p class="mb-0">
+                                                <?php if(isset(validation_errors()["descripcionTarea"])){
+                                                        echo str_replace("descripcionTarea","Descripcion",validation_errors()["descripcionTarea"]);
+                                                }?>
+                                            </p>
+                                        </div>
+                                        <div class="mb-3 d-flex justify-content-around">
+                                            <div class="col-5 d-flex">
+                                                <label for="prioridadTarea" class="col-form-label">Prioridad </label>
+                                                <select class="ms-2" name="prioridadTarea" id="prioridadTarea" <?php if(old("prioridadTarea")!=null) echo "value='".old("prioridadTarea")."'";else echo "value='".$tareaOsubtarea["prioridad"]."'"?>>
+                                                    <option value="1">Baja</option>
+                                                    <option value="2">Normal</option>
+                                                    <option value="3">Alta</option>
+                                                </select>
+                                            </div>
+                                            <?php $colores=["#6f3c1e5c","#7820695c","#4016645c","#2805555c","#276d345c","#035f785c"]?>
+                                            <div class="col-5 d-flex">
+                                                <label for="colorTarea" class="col-form-label">Color </label>
+                                                <div class="dropdown colorTarea">
+                                                    <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"><div style="background-color:<?= $tareaOsubtarea["color"]?>;"></div></button>
+                                                    <ul class="dropdown-menu dark">
+                                                        <li class="labelColorF" onClick="clickLabelColorTarea(event)">
+                                                            <label for="colorTarea1" class="dropdown-item" data-value="<?= $colores[0]?>" style="background-color: <?= $colores[0]?>"></label>
+                                                            <input type="radio" name="colorTarea" id="colorTarea1" value="<?= $colores[0]?>" <?php if($tareaOsubtarea["color"]==$colores[0])echo "checked";?> hidden onChange="checkColorTarea(event)">
+                                                        </li>
+                                                        <li onClick="clickLabelColorTarea(event)">
+                                                            <label for="colorTarea2" class="dropdown-item" data-value="<?= $colores[1]?>" style="background-color: <?= $colores[1]?>"></label>
+                                                            <input type="radio" name="colorTarea" id="colorTarea2" value="<?= $colores[1]?>" <?php if($tareaOsubtarea["color"]==$colores[1])echo "checked";?> hidden onChange="checkColorTarea(event)">
+                                                        </li>
+                                                        <li onClick="clickLabelColorTarea(event)">
+                                                            <label for="colorTarea3" class="dropdown-item" data-value="<?= $colores[2]?>" style="background-color: <?= $colores[2]?>"></label>
+                                                            <input type="radio" name="colorTarea" id="colorTarea3" value="<?= $colores[2]?>" <?php if($tareaOsubtarea["color"]==$colores[2])echo "checked";?> hidden onChange="checkColorTarea(event)">
+                                                        </li>
+                                                        <li onClick="clickLabelColorTarea(event)">
+                                                            <label for="colorTarea4" class="dropdown-item" data-value="<?= $colores[3]?>" style="background-color: <?= $colores[3]?>"></label>
+                                                            <input type="radio" name="colorTarea" id="colorTarea4" value="<?= $colores[3]?>" <?php if($tareaOsubtarea["color"]==$colores[3])echo "checked";?> hidden onChange="checkColorTarea(event)">
+                                                        </li>
+                                                        <li onClick="clickLabelColorTarea(event)">
+                                                            <label for="colorTarea5" class="dropdown-item" data-value="<?= $colores[4]?>" style="background-color: <?= $colores[4]?>"></label>
+                                                            <input type="radio" name="colorTarea" id="colorTarea5" value="<?= $colores[4]?>" <?php if($tareaOsubtarea["color"]==$colores[4])echo "checked";?> hidden onChange="checkColorTarea(event)">
+                                                        </li>
+                                                        <li class="labelColorL" onClick="clickLabelColorTarea(event)">
+                                                            <label for="colorTarea6" class="dropdown-item" data-value="<?= $colores[5]?>" style="background-color: <?= $colores[5]?>"></label>
+                                                            <input type="radio" name="colorTarea" id="colorTarea6" value="<?= $colores[5]?>" <?php if($tareaOsubtarea["color"]==$colores[5])echo "checked";?> hidden onChange="checkColorTarea(event)">
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="mb-3 d-flex flex-column align-items-center">
-                                        <label for="fechaRecordatorioTarea" class="col-form-label">Fecha de Recordatorio </label> 
-                                        <input type="datetime-local" class="form-control" id="fechaRecordatorioTarea" name="fechaRecordatorioTarea"  <?php
-                                        if(old("fechaRecordatorioTarea")!=null) echo "value='".old("fechaRecordatorioTarea")."'";else echo "value=''"?> min="<?php
-                                            date_default_timezone_set("America/Argentina/Buenos_Aires");
-                                            $hoy=date("U");
-                                            echo date("Y-m-d H:i",($hoy+86400));?>" max="<?php 
-                                            echo date("Y-m-d H:i",date_format(date_create($fechaTarea),"U")-86400);
-                                        ?>">
-                                        <p class="mb-0">
-                                            <?php if(isset(validation_errors()["fechaVencimientoSubTarea"])){
-                                                    echo str_replace("fechaVencimientoSubTarea","Fecha de Vencimiento",validation_errors()["fechaVencimientoSubTarea"]);
-                                            }?>
-                                        </p>
-                                    </div>
+                                        <div class="mb-3 d-flex flex-column align-items-center">
+                                            <label for="fechaRecordatorioTarea" class="col-form-label">Fecha de Recordatorio </label> 
+                                            <input type="datetime-local" class="form-control" id="fechaRecordatorioTarea" name="fechaRecordatorioTarea"  <?php
+                                            if(old("fechaRecordatorioTarea")!=null) echo "value='".old("fechaRecordatorioTarea")."'";else echo "value=''"?> min="<?php
+                                                date_default_timezone_set("America/Argentina/Buenos_Aires");
+                                                $hoy=date("U");
+                                                echo date("Y-m-d H:i",($hoy+86400));?>" max="<?php 
+                                                echo date("Y-m-d H:i",date_format(date_create($fechaTarea),"U")-86400);
+                                            ?>">
+                                            <p class="mb-0">
+                                                <?php if(isset(validation_errors()["fechaVencimientoSubTarea"])){
+                                                        echo str_replace("fechaVencimientoSubTarea","Fecha de Vencimiento",validation_errors()["fechaVencimientoSubTarea"]);
+                                                }?>
+                                            </p>
+                                        </div>
+                                    <?php }elseif($tareaOsubtarea["autor"]!=session()->get("usuario")["id"] && $tareaOsubtarea["tipoTC"]==2){?>
+                                        <div class="mb-3">
+                                            <label for="descripcionViejaTarea" class="col-form-label">Descripcion</label>
+                                            <textarea class="form-control" id="descripcionViejaTarea" disabled><?= $tareaOsubtarea["descripcion"]?></textarea>
+                                            <label for="descripcionTarea" class="col-form-label">Anexar</label>
+                                            <textarea class="form-control" name="descripcionTarea" id="descripcionTarea"><?php if(old("descripcionTarea")!=null) echo old("descripcionTarea");?></textarea>
+                                            <p class="mb-0">
+                                                <?php if(isset(validation_errors()["descripcionTarea"])){
+                                                        echo str_replace("descripcionTarea","Descripcion",validation_errors()["descripcionTarea"]);
+                                                }?>
+                                            </p>
+                                        </div>
+                                    <?php }?>
                                 </form>
                             </div>
                             <div class="modal-footer">
@@ -229,7 +251,7 @@
                     <?php $mensaje=session()->getFlashdata("mensaje"); ?>
                     <h5 class="dark m-0 ms-4 border-bottom border-<?php if(isset($mensaje["success"]))echo "success";elseif(isset($mensaje["success"])) echo "danger";?>"><?php if(isset($mensaje["mensaje"])) echo $mensaje["mensaje"];?></h5>
                 </div>
-                <?php if(isset($estadoTarea))if($estadoTarea<3){?>
+                <?php if(isset($visibilidadTarea))if($visibilidadTarea["estado"]<3 && session()->get("usuario")["id"]==$visibilidadTarea["autor"]){?>
                     <button type="button" id="botonNewSubTarea" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newSubTareaModal">Nueva subTarea</button>
                     <div class="modal fade" id="newSubTareaModal" tabindex="-1" aria-labelledby="newSubTareaModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
@@ -315,7 +337,7 @@
                                             </p>
                                         </div>
                                         <div class="mb-3 d-flex flex-column align-items-center">
-                                            <label for="fechaVencimientoSubTarea" class="col-form-label">Fecha de Vencimiento </label> 
+                                            <label for="fechaVencimientoSubTarea" class="col-form-label">Fecha de Vencimiento(Opcional)</label> 
                                             <input type="datetime-local" class="form-control" id="fechaVencimientoSubTarea" name="fechaVencimientoSubTarea"  <?php
                                             if(old("fechaVencimientoSubTarea")!=null) echo "value='".old("fechaVencimientoSubTarea")."'"?> min="<?php
                                                 date_default_timezone_set("America/Argentina/Buenos_Aires");
@@ -342,7 +364,7 @@
                     </div>
                 <?php }?>
                 <div class="dropdown ordenPagina">
-                    <button class="btn dropdown-toggle dark" type="button" data-bs-toggle="dropdown" aria-expanded="false">Recientes</button>
+                    <button class="btn dropdown-toggle dark" type="button" data-bs-toggle="dropdown" aria-expanded="false"><?php switch(session()->get("orden")){ case 1: echo "Recientes";break; case 2: echo "Prioridad";break; case 3: echo "Vencimiento"; default: echo "Recientes";}?></button>
                     <ul class="dropdown-menu dark">
                         <li>
                             <a class="dropdown-item text-reset text-decoration-none" href="<?php  echo base_url().$urlTarea."/".$idTarea."/1";?>">Recientes</a></label>
@@ -369,7 +391,7 @@
                                         <p class="dark fvt"><?= substr($tareaOsubtarea["fechaVencimiento"],0,-3)?></p>
                                     </div>
                                     <p class="dark et"><?php 
-                                        if($tareaOsubtarea["estado"] == "1") echo "Definida";else echo "En proceso";
+                                        if($tareaOsubtarea["estado"] == "1") echo "Definida";elseif($tareaOsubtarea["estado"] == "2") echo "En proceso";elseif($tareaOsubtarea["estado"] == "3") echo "Finalizada";
                                     ?></p>
                                 </div>
                             </a>

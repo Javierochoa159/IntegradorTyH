@@ -23,14 +23,14 @@ class Historial extends BaseController{
     private function todasLasSubTareas($id){
         try{
             $db = \Config\Database::connect();
-            $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.descripcionTarea AS descripcion, tareas.prioridadTarea AS prioridad, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, tareas.autorTarea AS autor, "tarea" AS tarea_subtarea
+            $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.descripcionTarea AS descripcion, tareas.prioridadTarea AS prioridad, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, tareas.autorTarea AS autor, NULL AS tipoTC, "tarea" AS tarea_subtarea
                                         FROM tareas
                                         LEFT JOIN tareasCompartidas ON tareasCompartidas.idTarea=tareas.idTarea
                                         WHERE tareas.idTarea = '.session()->get("idsUsuario")[$id-1].'
                                               AND tareas.tareaArchivada = 1
                                               AND tareas.autorTarea = '.session()->get("usuario")["id"].'
                                         UNION
-                                            SELECT subTareas.idSubTarea AS id, "" AS titulo, subTareas.descripcionSubTarea AS descripcion, subTareas.prioridadSubTarea AS prioridad, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, "" AS fechaRecordatorio, subTareas.colorSubTarea AS color, subTareas.autorSubTarea AS autor, "subtarea" AS tarea_subtarea
+                                            SELECT subTareas.idSubTarea AS id, "" AS titulo, subTareas.descripcionSubTarea AS descripcion, subTareas.prioridadSubTarea AS prioridad, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, "" AS fechaRecordatorio, subTareas.colorSubTarea AS color, subTareas.autorSubTarea AS autor, NULL AS tipoTC, "subtarea" AS tarea_subtarea
                                             FROM subTareas
                                             WHERE subTareas.idTarea = '.session()->get("idsUsuario")[$id-1].'
                                         ';
