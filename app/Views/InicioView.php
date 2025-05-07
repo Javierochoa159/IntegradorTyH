@@ -47,7 +47,7 @@
                 <div id="grid_list" class="btn btn-primary"><img src="https://img.icons8.com/?size=100&id=115942&format=png&color=000000" alt="list" onclick="grid_list(event)"></div>
                 <button type="button" id="botonNewTarea" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTareaModal">Nueva tarea</button>
                 <div class="dropdown ordenPagina">
-                    <button class="btn dropdown-toggle dark" type="button" data-bs-toggle="dropdown" aria-expanded="false">Recientes</button>
+                    <button class="btn dropdown-toggle dark btn" type="button" data-bs-toggle="dropdown" aria-expanded="false"><?php switch(session()->get("orden")){ case 1: echo "Recientes";break; case 2: echo "Prioridad";break; case 3: echo "Vencimiento";break; default: echo "recientes";}?></button>
                     <ul class="dropdown-menu dark">
                         <li>
                             <a class="dropdown-item text-reset text-decoration-none" href="<?php $tipoPag=session()->get("pagina"); switch($tipoPag){case 2: echo base_url()."inicio/mis_tareas/1";break; case 3: echo base_url()."inicio/tareas_compartidas/1";break; default: echo base_url()."inicio/todas/1";}?>">Recientes</a></label>
@@ -176,10 +176,10 @@
                                 <div class="fechaEstadoTarea">
                                     <div class="d-flex">
                                         <p class="dark frt"><?php if($tarea["fechaRecordatorio"]!=null) echo substr($tarea["fechaRecordatorio"],0,-3)?></p>
-                                        <p class="dark fvt"><?= substr($tarea["fechaVencimiento"],0,-3)?></p>
+                                        <p class="dark fvt <?php if(date("U")-date_format(date_create($tarea["fechaVencimiento"]),"U")<=604800) echo "fechaVence";?>"><?= substr($tarea["fechaVencimiento"],0,-3)?></p>
                                     </div>
                                     <p class="dark et"><?php 
-                                        if($tarea["estado"] == "1") echo "Definida";elseif($tarea["estado"] == "2") echo "En proceso";elseif($tarea["estado"] == "3") echo "Finalizada";
+                                        switch($tarea["estado"]) {case "1": echo "Definida";break; case "2": echo "En proceso";break; case "3": echo "Finalizada";}
                                     ?></p>
                                 </div>
                             </a>

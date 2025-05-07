@@ -9,7 +9,6 @@ use Error;
 Class Inicio extends BaseController{
     public function __construct(){ 
         helper ('form');
-        session()->set("orden",1);
     }
     public function index(){
         if(session()->has("usuario")){
@@ -105,24 +104,29 @@ Class Inicio extends BaseController{
     private function getOrden(){
         switch(session()->get("orden")){
             case 1: return "Order By id DESC";
-            case 2: return "Order By fechaVencimiento";
-            case 3: return "Order By prioridad";
+            case 2: return "ORDER BY prioridadOrdenada DESC, fechaVencimiento ASC";
+            case 3: return "Order By fechaVencimiento";
         }
     }
     private function todasLasTareas(){
         try{
             $db = \Config\Database::connect();
-            $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.prioridadTarea AS prioridad, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, "tarea" AS tarea_subtarea
+            $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.prioridadTarea AS prioridad, tareas.prioridadTarea AS prioridadOrdenada, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, tareas.recordatorioNotificado AS recoNotify, tareas.autorTarea AS autor, "tarea" AS tarea_subtarea
                                             FROM tareas
                                             LEFT JOIN tareasCompartidas ON tareasCompartidas.idTarea=tareas.idTarea
                                             WHERE    (tareas.autorTarea = '.session()->get("usuario")["id"].' AND tareas.tareaArchivada = 0)
-                                                  OR (tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].' AND tareasCompartidas.estadoTareaCompartida = "1")
+                                                  OR (tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].' AND tareasCompartidas.estadoTareaCompartida = "1" AND tareasCompartidas.idSubTarea IS NULL)
                                             UNION
-                                                SELECT subTareas.idSubTarea AS id, subTareas.descripcionSubTarea AS titulo, subTareas.prioridadSubTarea AS prioridad, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, "" AS fechaRecordatorio, subTareas.colorSubTarea AS color, "subtarea" AS tarea_subtarea
+                                                SELECT subTareas.idSubTarea AS id, subTareas.descripcionSubTarea AS titulo, subTareas.prioridadSubTarea AS prioridad,CASE 
+                                                    WHEN subTareas.prioridadSubTarea = 4 THEN 3
+                                                    WHEN subTareas.prioridadSubTarea = 3 THEN 2 
+                                                    WHEN subtareas.prioridadSubTarea = 2 THEN 1
+                                                    WHEN subtareas.prioridadSubTarea = 1 THEN 0
+                                                END AS prioridadOrdenada, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, NULL AS fechaRecordatorio, subTareas.colorSubTarea AS color, NULL AS recoNotify, subTareas.autorSubTarea AS autor, "subtarea" AS tarea_subtarea
                                                 FROM subTareas
                                                 LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea=subTareas.idSubTarea
                                                 WHERE tareasCompartidas.estadoTareaCompartida="1"
-                                                      AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].'
+                                                      AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].' 
                                             ';
             $sql.=$this->getOrden();
             $query   = $db->query($sql);
@@ -131,6 +135,11 @@ Class Inicio extends BaseController{
             $aux=[];
             foreach($datos["tareas"] as $tarea){
                 $aux[]=$tarea["id"];
+                if(isset($tarea["fechaRecordatorio"]) && isset($tarea["recoNotify"])){
+                    if(date("U")-date_format(date_create($tarea["fechaRecordatorio"]),"U")>=0 && $tarea["recoNotify"]==0){
+                        $this->notificarRecordatorio($tarea);
+                    }
+                }
             }
             session()->set("ids",$aux);
             $datos["ids"]=$aux;
@@ -140,10 +149,32 @@ Class Inicio extends BaseController{
             return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error inesperado<br>Estamos trabajando en ello"]);
         }
     }
+    private function notificarRecordatorio($tarea){
+        $user=new UsuarioModel();
+        $userEmail=$user->select("emailUsuario")->find($tarea["autor"]);
+        $user=null;
+        if(isset($userEmail)){
+            if(!empty($userEmail)){
+                $email=\Config\Services::email();
+                $email->setFrom("correoprueba.proyectos99@gmail.com","IntegradorTyH","rechazados@inbox.mailtrap.io");
+                $email->setReplyTo("respuestas@inbox.mailtrap.io");
+                $email->setTo($userEmail["emailUsuario"]);
+                $email->setSubject("Recordatorio Tarea");
+                $email->setMessage("La fecha de vencimiento de la tarea '".$tarea["titulo"]."' se acerca.<br>Vence el ".substr($tarea["fechaVencimiento"],0,-3));
+                if($email->send()){
+                    $tareas=new TareaModel();
+                    if($tareas->update($tarea["id"],["recordatorioNotificado"=>true])){
+                        $tarea["recoNotify"]=1;
+                    }
+                    $tareas=null;
+                }
+            }
+        }
+    }
     private function todasMisTareasActivas(){
         try{
             $db = \Config\Database::connect();
-            $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.prioridadTarea AS prioridad, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, "tarea" AS tarea_subtarea
+            $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.prioridadTarea AS prioridad, tareas.prioridadTarea AS prioridadOrdenada, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, "tarea" AS tarea_subtarea
                                             FROM tareas
                                             WHERE tareas.autorTarea = '.session()->get("usuario")["id"].'
                                                   AND tareas.tareaArchivada = 0
@@ -168,13 +199,19 @@ Class Inicio extends BaseController{
     public function todasLasTareasCompartidas(){
         try{
             $db = \Config\Database::connect();
-            $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.prioridadTarea AS prioridad, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, "tarea" AS tarea_subtarea
+            $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.prioridadTarea AS prioridad, tareas.prioridadTarea AS prioridadOrdenada, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, "tarea" AS tarea_subtarea
                                         FROM tareas
                                         LEFT JOIN tareasCompartidas ON tareasCompartidas.idTarea=tareas.idTarea
                                         WHERE tareasCompartidas.estadoTareaCompartida = "1"
                                               AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].'
+                                              AND tareasCompartidas.idSubTarea IS NULL
                                         UNION
-                                            SELECT subTareas.idSubTarea AS id, subTareas.descripcionSubTarea AS titulo, subTareas.prioridadSubTarea AS prioridad, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, "" AS fechaRecordatorio, subTareas.colorSubTarea AS color, "subtarea" AS tarea_subtarea
+                                            SELECT subTareas.idSubTarea AS id, subTareas.descripcionSubTarea AS titulo, subTareas.prioridadSubTarea AS prioridad,CASE 
+                                                    WHEN subTareas.prioridadSubTarea = 4 THEN 3
+                                                    WHEN subTareas.prioridadSubTarea = 3 THEN 2 
+                                                    WHEN subtareas.prioridadSubTarea = 2 THEN 1
+                                                    WHEN subtareas.prioridadSubTarea = 1 THEN 0
+                                                END AS prioridadOrdenada, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, "" AS fechaRecordatorio, subTareas.colorSubTarea AS color, "subtarea" AS tarea_subtarea
                                             FROM subTareas
                                             LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea=subTareas.idSubTarea
                                             WHERE tareasCompartidas.estadoTareaCompartida = "1"
@@ -225,8 +262,10 @@ Class Inicio extends BaseController{
     }
 
     public function tarea($id){
+        session()->set("orden",1);
         if(session()->get("pagina")!=4){
             session()->set("pagina",1);
+            session()->set("orden",1);
             if(isset(session()->get("ids")[$id-1]))
                 return redirect()->to(base_url()."tarea/".$id);
             else return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al ingresar a la tarea"]);
@@ -240,11 +279,13 @@ Class Inicio extends BaseController{
         else return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error inesperado. Estamos trabajando en ello"]);
     }
     public function subTarea($id){
-        if(session()->get("pagina")!=4){
+        session()->set("orden",1);
+        if(session()->get("pagina")==1||session()->get("pagina")==2){
             session()->set("pagina",1);
-            session()->set("subTareaShare",session()->get("ids")[$id-1]);
-            if(isset(session()->get("ids")[$id-1]))
+            if(isset(session()->get("ids")[$id-1])){
+                session()->set("subTareaShare",[$id=>session()->get("ids")[$id-1]]);
                 return redirect()->to(base_url()."subtarea/".$id);
+            }
             else return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al ingresar a la subtarea"]);
         }
         else return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error inesperado. Estamos trabajando en ello"]);
