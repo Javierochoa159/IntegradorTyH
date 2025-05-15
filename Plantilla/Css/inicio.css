@@ -135,6 +135,7 @@ select.light{
     border-radius: 5px;
     padding: 0.3rem;
     margin: 0;
+    margin-left: 0.3rem;
 }
 #tareasDiv.list .tarea, #tareasDiv.list .subtarea{
     display: flex;
@@ -263,12 +264,14 @@ select.light{
 #tareasDiv.list .fechaEstadoTarea div{
     width: 65%;
     justify-content: space-between;
+    align-items: center;
 }
 #tareasDiv.grid .fechaEstadoTarea div{
     justify-content: space-between;
     margin-bottom: 0.5rem;
     padding-right: 0.5rem;
     padding-left: 0.5rem;
+    align-items: center;
 }
 #tareasDiv.grid .fechaEstadoTarea p.et{
     width: 100%;

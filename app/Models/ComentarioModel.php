@@ -10,4 +10,13 @@ class ComentarioModel extends Model{
     protected $useSoftDeletes = false;
     protected $allowedFields = ['idSubTarea','idUsuario','comentario','estado'];
     protected bool $updateOnlyChanged = true;
+
+    public function insertNewComentario($idSubTarea,$comentarioSubTarea){
+        $sqlIn=[
+                    "idSubTarea"=>$idSubTarea,
+                    "idUsuario"=>session()->get("usuario")["id"],
+                    "comentario"=>$comentarioSubTarea
+                ];
+        return $this->insert($sqlIn);
+    }
 }

@@ -40,7 +40,7 @@
         </aside>
         <div class="principalDiv">
             <div class="col-12 d-flex flex-column align-items-center justify-content-center">
-                <div class="col-12 text-start "<?php $mensajeTarea=session()->getFlashdata("mensajeTarea");?>>
+                <div class="col-12 mb-3 text-start "<?php $mensajeTarea=session()->getFlashdata("mensajeTarea");?>>
                     <h5 class="dark m-0 ms-4 <?php if(isset($mensajeTarea["success"]))echo "border-bottom border-success";elseif(isset($mensajeTarea["error"])) echo "border-bottom border-danger";?>"><?php if(isset($mensajeTarea["mensaje"])) echo $mensajeTarea["mensaje"];?></h5>
                 </div>
                 <div class="col-11 d-flex justify-content-center">
@@ -68,7 +68,7 @@
                         <div class="dropdown optTarea dark">
                             <button class="btn dropdown-toggle dark" type="button" data-bs-toggle="dropdown" aria-expanded="false"><img src="https://img.icons8.com/?size=100&id=7m1CoJ6JRUqG&format=png&color=000000" alt="options"></button>
                             <ul class="dropdown-menu dark">
-                                <?php if($tareaOsubtarea["tipoTC"]>=2){?>
+                                <?php if($tareaOsubtarea["tipoTC"]>=2 || $tareaOsubtarea["autor"]==session()->get("usuario")["id"]){?>
                                 <li>
                                     <p id="botonModTarea" class="dropdown-item text-reset text-decoration-none mb-0" data-bs-toggle="modal" data-bs-target="#modTareaModal">Modificar</p>
                                 </li>
@@ -82,15 +82,44 @@
                                 <li>
                                     <a class="dropdown-item text-reset text-decoration-none" href="<?php  echo base_url()."tarea/estadotarea/".$idTarea;?>"><?php if($tareaOsubtarea["estado"] == "1") echo "Empezar";elseif($tareaOsubtarea["estado"] == "2") echo "Finalizar";?></a>
                                 </li>
-                                <?php }elseif($tareaOsubtarea["estado"]==3 && $tareaOsubtarea["autor"]==session()->get("usuario")["id"]){?>
+                                <?php }elseif($tareaOsubtarea["estado"]==3 && $tareaOsubtarea["autor"]==session()->get("usuario")["id"] && $urlTarea=="tarea"){?>
                                 <li>
                                     <a class="dropdown-item text-reset text-decoration-none" href="<?php  echo base_url()."tarea/archivartarea/".$idTarea;?>">Archivar</a>
                                 </li>
                                <?php }?>
+                               <?php if($tareaOsubtarea["autor"]==session()->get("usuario")["id"]){?>
+                                <li>
+                                    <p id="botonEliminarTarea" class="dropdown-item text-reset text-decoration-none mb-0" data-bs-toggle="modal" data-bs-target="#eliminarTareaModal">Eliminar</p>
+                                </li>
+                                <?php }?>
                             </ul>
                         </div>
                         
                     </div>
+                    <?php if($tareaOsubtarea["autor"]==session()->get("usuario")["id"]){?>
+                        <div class="modal fade" id="eliminarTareaModal" tabindex="-1" aria-labelledby="eliminarTareaModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content dark">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="eliminarTareaModalLabel">Eliminar Tarea</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="deleteTarea" action="<?= base_url().$urlTarea."/eliminartarea"?>" method="post">
+                                           <div class="mb-3">
+                                                <h3>Seguro que desea eliminar la tarea?</h3>
+                                            </div>
+                                            <input type="number" name="idTarea" value="<?= $idTarea?>" hidden>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="reset" form="deleteTarea" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" form="deleteTarea" class="btn btn-primary">Eliminar</button>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php }?>
                     <div class="modal fade" id="modTareaModal" tabindex="-1" aria-labelledby="modTareaModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content dark">

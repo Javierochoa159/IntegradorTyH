@@ -14,7 +14,6 @@ Class Registrar extends BaseController{
     }
     public function exito(){
         helper("spanishErrors_helper");
-        $usuario=new UsuarioModel();
         $post=$this->request->getPost(['user',"email","pass"]);
         $validacion = service('validation');
         $reglas=[
@@ -29,11 +28,11 @@ Class Registrar extends BaseController{
         }
         $user=new UsuarioModel();
         $mensaje=array();
-        $data=$user->where('usuarioUsuario',$post["user"])->findColumn("idUsuario");
+        $data=$user->getUsuarioAtUserName($post["user"]);
         if(!empty($data)){
             $mensaje["user"]= "El usuario ingresado ya está en uso.";
         }
-        $data=$user->where('emailUsuario',$post["email"])->findColumn("idUsuario");
+        $data=$user->getIdUserAtEmail($post["email"]);
         if(!empty($data)){
             $mensaje["email"]= "El correo ingresado ya está en uso.";
         }
@@ -42,11 +41,10 @@ Class Registrar extends BaseController{
             return redirect()->to(base_url()."registrar")->withInput()->with('errors',$mensaje);
         }else{
             $this->encriptado=\Config\Services::encrypter();
-            $userId=$usuario->insert([
-                "usuarioUsuario"=>$post["user"],
-                "emailUsuario"=>$post["email"],
-                "passUsuario"=>base64_encode($this->encriptado->encrypt($post["pass"])),
-            ],true);
+            $userId=$user->insertNewUser(
+                $post["user"],
+                $post["email"],
+                base64_encode($this->encriptado->encrypt($post["pass"])));
             $post["pass"]="";
             if(!$userId){
                 $user=null;

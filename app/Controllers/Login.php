@@ -31,7 +31,7 @@ Class Login extends BaseController{
         
         $user=new UsuarioModel();
         $mensaje=array();
-        $data=$user->where('emailUsuario',$post["email"])->findColumn("passUsuario");
+        $data=$user->getPassUser($post["email"]);
         if(empty($data)){
             $mensaje["email"]= "Correo no encontrado.";
         }else{
@@ -46,7 +46,7 @@ Class Login extends BaseController{
             $user=null;
             return redirect()->to(base_url()."login")->withInput()->with('errors',$mensaje);
         }else{
-            $userInfo=$user->where('emailUsuario',$post["email"])->find();
+            $userInfo=$user->getUserInfo($post["email"]);
             $user=null;
             if(empty($userInfo)){
                 return redirect()->to(base_url()."login")->with('errors',["errorLogin"=>"Ocurrio un error al iniciar sesion<br>Intente nuevamente despues de unos minutos."]);

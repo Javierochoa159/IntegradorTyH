@@ -31,7 +31,7 @@ class Tarea extends BaseController{
                 return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error inesperado al momento de crear una SubTarea<br>Intentelo nuevamente en unos minutos"]);
             }else{
                 $tarea=new TareaModel();
-                $idAutorT = $tarea->select("autorTarea")->find(session()->get("ids")[$this->request->getPost("idTarea")-1]);
+                $idAutorT = $tarea->getAutorTarea(session()->get("ids")[$this->request->getPost("idTarea")]);
                 $tarea=null;
                 if(isset($idAutorT)){
                     if(!empty($idAutorT)){
@@ -50,19 +50,11 @@ class Tarea extends BaseController{
                             {
                                 return redirect()->to(base_url()."tarea/".$post["idTarea"])->withInput();
                             }
-                            $user=new UsuarioModel();
                             $data=[];
-                            $sqlIn=[
-                                "descripcionSubTarea"=>$post["descripcionSubTarea"],
-                                "prioridadSubTarea"=>$post["prioridadSubTarea"],
-                                "colorSubTarea"=>$post["colorSubTarea"],
-                                "fechaVencimientoSubTarea"=>$post["fechaVencimientoSubTarea"],
-                                "autorSubTarea"=> session()->get("usuario")["id"],
-                                "idTarea"=>session()->get("ids")[$post["idTarea"]-1]
-                            ];
+                            $user=new UsuarioModel();
                             if($post["responsableSubTarea"]!=null){
                                 $mensaje=array();
-                                $data=$user->select("idUsuario, emailUsuario")->where('usuarioUsuario',$post["responsableSubTarea"])->find();
+                                $data=$user->getIdEmailUser($post["responsableSubTarea"]);
                                 $user=null;
                                 if(empty($data)){
                                     $mensaje["responsableSubTarea"]="El usuario ingresado no existe.";
@@ -71,9 +63,12 @@ class Tarea extends BaseController{
                                     return redirect()->back()->withInput()->with('mensaje',$mensaje);
                                 }
                             }
-                            $sqlIn["responsableSubTarea"]=session()->get("usuario")["id"];
                             $subTarea=new SubTareaModel();
-                            $idSubTarea=$subTarea->insert($sqlIn,true);
+                            $idSubTarea=$subTarea->insertNewSubTarea($post["descripcionSubTarea"],
+                                                                       $post["prioridadSubTarea"],
+                                                                           $post["colorSubTarea"],
+                                                                $post["fechaVencimientoSubTarea"],
+                                                                                 session()->get("ids")[$post["idTarea"]-1]);
                             $subTarea=null;
                             if($idSubTarea){
                                 if(isset($data[0]["emailUsuario"])){
@@ -87,12 +82,7 @@ class Tarea extends BaseController{
                                 }
                                 if($post["comentarioSubTarea"]!=null){
                                     $comentario=new ComentarioModel();
-                                    $sqlIn=[
-                                        "idSubTarea"=>$idSubTarea,
-                                        "idUsuario"=>session()->get("usuario")["id"],
-                                        "comentario"=>$post["comentarioSubTarea"]
-                                    ];
-                                    if(!$comentario->insert($sqlIn)){
+                                    if(!$comentario->insertNewComentario($idSubTarea,$post["comentarioSubTarea"])){
                                         $comentario=null;
                                         $mensajeComentario="Error al crear el comentarios de la subTarea";
                                     }
@@ -121,19 +111,12 @@ class Tarea extends BaseController{
     }
     public function cargarResponsable($idUser,$emailUser,$idTarea,$idSubTarea){
         try{
-            $sqlIn=[
-                "idUsuario" =>$idUser,
-                "tipoTareaCompartida"=>"3",
-                "idTarea"=>session()->get("ids")[$idTarea-1],
-                "idSubTarea"=>$idSubTarea
-            ];
             $tc=new TareaCompartidaModel();
-            $res=$tc->select("idTareaCompartida, tipoTareaCompartida, estadoTareaCompartida")->where("idTarea=".session()->get("ids")[$idTarea-1]." AND idUsuario=".$idUser." AND idSubTarea=".$idSubTarea)->find();
+            $res=$tc->getTCSubTarea(session()->get("ids")[$idTarea-1],$idUser,$idSubTarea);
             if(!isset($res)){
                 $tc=null;
                 return 0;
-            }
-            if(!empty($res)){
+            }elseif(!empty($res)){
                 $tc=null;
                 if($res[0]["estadoTareaCompartida"]==0){
                     return 2;
@@ -149,23 +132,24 @@ class Tarea extends BaseController{
                         $emailRes=$email->send();
                     }
                 }
-            }
-            $idTC=$tc->insert($sqlIn,true);
-            $tc=null;
-            if($idTC){
-                $email=\Config\Services::email();
-                $email->setFrom("correoprueba.proyectos99@gmail.com","IntegradorTyH","rechazados@inbox.mailtrap.io");
-                $email->setReplyTo("respuestas@inbox.mailtrap.io");
-                $email->setTo($emailUser);
-                $email->setSubject("Responsable de SubTarea");
-                $email->setMessage("Se te ha asignado como responsable en una subtarea.<br><a href='".base_url()."/subtarea/procesarresponsable/".$idTC."/1'>Aceptar</a><a href='".base_url()."/subtarea/procesarresponsable/".$idTC."/2'>Rechazar</a>");
-                $emailRes=$email->send();
-                while(!$emailRes){
-                    $emailRes=$email->send();
-                }
-                return 1;
             }else{
-                return 0;
+                $idTC=$tc->insertNewTCSubTarea($idUser,"3",session()->get("ids")[$idTarea-1],$idSubTarea);
+                $tc=null;
+                if($idTC){
+                    $email=\Config\Services::email();
+                    $email->setFrom("correoprueba.proyectos99@gmail.com","IntegradorTyH","rechazados@inbox.mailtrap.io");
+                    $email->setReplyTo("respuestas@inbox.mailtrap.io");
+                    $email->setTo($emailUser);
+                    $email->setSubject("Responsable de SubTarea");
+                    $email->setMessage("Se te ha asignado como responsable en una subtarea.<br><a href='".base_url()."/subtarea/procesarresponsable/".$idTC."/1'>Aceptar</a><a href='".base_url()."/subtarea/procesarresponsable/".$idTC."/2'>Rechazar</a>");
+                    $emailRes=$email->send();
+                    while(!$emailRes){
+                        $emailRes=$email->send();
+                    }
+                    return 1;
+                }else{
+                    return 0;
+                }
             }
         }catch(Error $e){
             return 0;
@@ -174,30 +158,8 @@ class Tarea extends BaseController{
 
     private function todasLasSubTareas($id){
         try{
-            $db = \Config\Database::connect();
-            $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.descripcionTarea AS descripcion, tareas.prioridadTarea AS prioridad, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, tareas.autorTarea AS autor, CASE WHEN tareasCompartidas.tipoTareaCompartida IS NOT NULL THEN tareasCompartidas.tipoTareaCompartida ELSE 0 END AS tipoTC, "tarea" AS tarea_subtarea
-                                        FROM tareas
-                                        LEFT JOIN tareasCompartidas ON tareasCompartidas.idTarea=tareas.idTarea
-                                        WHERE tareas.idTarea='.session()->get("ids")[$id-1].'
-                                              AND (
-                                                   (tareas.autorTarea = '.session()->get("usuario")["id"].' AND tareas.tareaArchivada = 0)
-                                                  OR
-                                                   (tareasCompartidas.estadoTareaCompartida="1" AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].')
-                                                  )
-                                        UNION
-                                            SELECT subTareas.idSubTarea AS id, "" AS titulo, subTareas.descripcionSubTarea AS descripcion, subTareas.prioridadSubTarea AS prioridad, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, "" AS fechaRecordatorio, subTareas.colorSubTarea AS color, subTareas.autorSubTarea AS autor, "" AS tipoTC, "subtarea" AS tarea_subtarea
-                                            FROM subTareas
-                                            LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea=subTareas.idSubTarea
-                                            WHERE subTareas.idTarea = '.session()->get("ids")[$id-1].'
-                                                  AND (subTareas.autorSubTarea = '.session()->get("usuario")["id"].'
-                                                       OR
-                                                       (tareasCompartidas.estadoTareaCompartida="1" AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].')
-                                                      )
-                                        ';
-            $sql.=$this->getOrden();
-            $query   = $db->query($sql);
-            $datos["tarea_subTareas"] = $query->getResultArray();
-            $db->close();
+            $tareaModel=new TareaModel();
+            $datos["tarea_subTareas"] = $tareaModel->todasLasSubTareas(session()->get("ids")[$id-1],$this->getOrden());
             $aux=[];
             foreach ($datos["tarea_subTareas"] as $tareaOsubtarea) {
                 if($tareaOsubtarea["tarea_subtarea"]=="tarea") continue;
@@ -232,51 +194,48 @@ class Tarea extends BaseController{
             case 1: return "Order By id DESC";
             case 2: return "Order By prioridad DESC";
             case 3: return "Order By fechaVencimiento DESC";
+            default: return "Order By id DESC";
         }
     }
 
     public function setEstadoTarea($id){
         try{
             if(isset(session()->get("ids")[$id-1])){
-                $idTarea=session()->get("ids")[$id-1];
-                $tarea=new TareaModel();
-                $estado=$tarea->select("estadoTarea")->find($idTarea);
+                $tareaModel=new TareaModel();
+                $estado=$tareaModel->getEstadoTarea(session()->get("ids")[$id-1]);
                 if($estado!=null){
                     switch($estado["estadoTarea"]){
-                        case 1: if(!$tarea->update($idTarea,["estadoTarea"=>"2"])){
-                                    $tarea=null;
+                        case 1: if(!$tareaModel->updateEstadoTarea(session()->get("ids")[$id-1],"2")){
+                                    $tareaModel=null;
                                     return redirect()->to(base_url()."tarea/".$id)->with("error",["mensaje"=>"No se pudo modificar el estado de la Tarea<br>Intente nuevamente en unos minutos"]);
                                 }
-                                $tarea=null;
+                                $tareaModel=null;
                                 return redirect()->to(base_url()."tarea/".$id)->with("success",["mensaje"=>"Estado modificado con exito"]);
-                        case 2: $db = \Config\Database::connect();
-                                $sql='  SELECT COALESCE(SUM(CASE WHEN estadoSubTarea = "3" THEN 1 ELSE 0 END), 0) AS totalFinalizadas,
-                                               COUNT(estadoSubTarea) AS totalSubTareas
-                                               
-                                        FROM subTareas
-                                        WHERE idTarea='.$idTarea.'
-                                      ';
-                                $query   = $db->query($sql);
-                                $datos = $query->getResultArray();
-                                $db->close();
-                                $tarea=new TareaModel();
+                        case 2: $datos = $tareaModel->isValidFinalizarTarea(session()->get("ids")[$id-1]);
                                 if(!isset($datos[0]["totalFinalizadas"])||!isset($datos[0]["totalSubTareas"])){
-                                    $tarea=null;
+                                    $tareaModel=null;
                                     return redirect()->to(base_url()."tarea/".$id)->with("mensajeTarea",["error"=>"","mensaje"=>"No se pudo modificar el estado de la Tarea<br>Intente nuevamente en unos minutos"]);
                                 }elseif($datos[0]["totalFinalizadas"]!=$datos[0]["totalSubTareas"]){
-                                    $tarea=null;
+                                    $tareaModel=null;
                                     return redirect()->to(base_url()."tarea/".$id)->with("mensajeTarea",["error"=>"","mensaje"=>"No se pudo modificar el estado de la Tarea<br>Primero finalice todas las subTareas"]);
-                                }elseif(!$tarea->update($idTarea,["estadoTarea"=>"3"])){
-                                    $tarea=null;
+                                }elseif(!$tareaModel->updateEstadoTarea(session()->get("ids")[$id-1],"3")){
+                                    $tareaModel=null;
                                     return redirect()->to(base_url()."tarea/".$id)->with("mensajeTarea",["error"=>"","mensaje"=>"No se pudo modificar el estado de la Tarea<br>Intente nuevamente en unos minutos"]);
                                 }
-                                $tarea=null;
+                                $tareaModel=null;
                                 $tareaComp=new TareaCompartidaModel();
-                                $res=$tareaComp->where("idTarea=".$idTarea." AND estadoTareaCompartida='1'")->update(null,["estadoTareaCompartida"=>'3']);
-                                while(!$res){
-                                    $res=$tareaComp->where("idTarea=".$idTarea." AND estadoTareaCompartida='1'")->update(null,["estadoTareaCompartida"=>'3']);
+                                $res=$tareaComp->finalizarTC(session()->get("ids")[$id-1]);
+                                if(!$res){
+                                    $i=0;
+                                    while(!$res&&$i<10){
+                                        $res=$tareaComp->finalizarTC(session()->get("ids")[$id-1]);
+                                        $i++;
+                                    }
+                                    if(!$res){
+                                        return redirect()->to(base_url()."tarea/".$id)->with("mensajeTarea",["error"=>"","mensaje"=>"Tarea finalizada con exito.<br>No se pudo finalizar la tarea para los usuarios compartidos"]);
+                                    }
                                 }
-                                return redirect()->to(base_url()."tarea/".$id)->with("mensajeTarea",["success"=>"","mensaje"=>"Estado modificado con exito"]);
+                                return redirect()->to(base_url()."tarea/".$id)->with("mensajeTarea",["success"=>"","mensaje"=>"Tarea finalizada modificado con exito"]);
                     }
                 }            
             }
@@ -291,11 +250,11 @@ class Tarea extends BaseController{
             if(!isset(session()->get("ids")[$id-1])){
                 return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Tarea no encontrada."]);
             }
-            $idTarea=session()->get("ids")[$id-1];
             $tarea=new TareaModel;
-            if(!$tarea->update($idTarea,["tareaArchivada"=>true])){
+            if(!$tarea->archivarTarea(session()->get("ids")[$id-1])){
                 return redirect()->to("tarea/".$id)->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentar archivar la tarea.<br>Intente nuevamente en unos minutos."]);
             }
+            $idTarea=session()->get("ids")[$id-1];
             $arrayIds=session()->get("ids");
             array_splice($arrayIds,0,$id,array_slice($arrayIds,0,$id-1));
             session()->set("ids",$arrayIds);
@@ -325,15 +284,13 @@ class Tarea extends BaseController{
                 {
                     return redirect()->to(base_url()."tarea/".$id)->withInput();
                 }
-                $sqlIn=[
-                    "tituloTarea"=>$post["tituloTarea"],
-                    "descripcionTarea"=>$post["descripcionTarea"],
-                    "prioridadTarea"=>$post["prioridadTarea"],
-                    "colorTarea"=>$post["colorTarea"]
-                ];
-                if($post["fechaRecordatorioTarea"]!=null) $sqlIn["fechaRecordatorioTarea"]=$post["fechaRecordatorioTarea"];
                 $tarea=new TareaModel();
-                if($tarea->update(session()->get("ids")[$id-1],$sqlIn)){
+                if($tarea->updateTarea(session()->get("ids")[$id-1],
+                                   $post["tituloTarea"],
+                              $post["descripcionTarea"],
+                                $post["prioridadTarea"],
+                                    $post["colorTarea"],
+                        $post["fechaRecordatorioTarea"])){
                     $tarea=null;
                     return redirect()->to(base_url().'tarea/'.$id)->with("mensaje",["success"=> "", "mensaje" => "Tarea modificada!"]);
                 }else{
@@ -363,14 +320,14 @@ class Tarea extends BaseController{
                     return redirect()->to(base_url()."tarea/".$id)->withInput();
                 }
                 $tarea=new TareaModel();
-                $viejaDesc=$tarea->select("descripcionTarea")->find(session()->get("ids")[$id-1]);
+                $viejaDesc=$tarea->getDescripcionTarea(session()->get("ids")[$id-1]);
                 if(!isset($viejaDesc)){
                     return redirect()->to(base_url().'tarea/'.$id)->with("mensaje",["error"=> "", "mensaje"=> "Error al modificar la tarea<br>Intente nuevamente en unos minutos"]);
                 }
                 if(empty($viejaDesc)){
                     return redirect()->to(base_url().'tarea/'.$id)->with("mensaje",["error"=> "", "mensaje"=> "Error al modificar la tarea<br>Intente nuevamente en unos minutos"]);
                 }
-                if(!$tarea->update(session()->get("ids")[$id-1],["descripcionTarea"=>$viejaDesc["descripcionTarea"]."\n".$post["descripcionTarea"]])){
+                if(!$tarea->anexarTarea(session()->get("ids")[$id-1],$viejaDesc["descripcionTarea"],$post["descripcionTarea"])){
                     $tarea=null;
                     return redirect()->to(base_url().'tarea/'.$id)->with("mensaje",["error"=> "", "mensaje"=> "Error al modificar la tarea<br>Intente nuevamente en unos minutos"]);
                 }
@@ -398,7 +355,7 @@ class Tarea extends BaseController{
             $user=new UsuarioModel();
             $data=[];        
             $mensaje=array();
-            $data=$user->select("idUsuario, emailUsuario")->where('usuarioUsuario',$post["usuarioCompartirTarea"])->find();
+            $data=$user->getIdEmailUser($post["usuarioCompartirTarea"]);
             $user=null;
             if(empty($data)){
                 $mensaje["usuarioCompartirTarea"]="El usuario ingresado no existe.";
@@ -408,18 +365,14 @@ class Tarea extends BaseController{
             if(!empty($mensaje)){
                 return redirect()->back()->withInput()->with('mensaje',$mensaje);
             }
-            $sqlIn=[
-                "idUsuario" =>$data[0]["idUsuario"],
-                "tipoTareaCompartida"=>$post["accesibilidadCompartirTarea"],
-                "idTarea"=>session()->get("ids")[$post["idTarea"]-1]
-            ];
             $tc=new TareaCompartidaModel();
-            $res=$tc->select("tipoTareaCompartida, estadoTareaCompartida")->where("idTarea=".session()->get("ids")[$post["idTarea"]-1]." AND idUsuario=".$data[0]["idUsuario"])->find();
+            $res=$tc->getTCTarea(session()->get("ids")[$post["idTarea"]-1],$data[0]["idUsuario"]);
             if(!empty($res)){
-                if($res[0]["tipoTareaCompartida"]!=$sqlIn["tipoTareaCompartida"] && $res[0]["estadoTareaCompartida"]==1){
-                    if(!$tc->where("idTarea=".session()->get("ids")[$post["idTarea"]-1]." AND idUsuario=".$data[0]["idUsuario"])->update(null,["tipoTareaCompartida"=>$sqlIn['tipoTareaCompartida']]))
-                    $tc=null;
-                    return redirect()->to(base_url().'tarea/'.$post["idTarea"])->with("mensaje",["error"=> "", "mensaje"=> "El usuario ya a aceptado la invitacion previamente<br>No se pudo modificar la accesibilidad. Intente nuevamente en unos minutos"]);
+                if($res[0]["tipoTareaCompartida"]!=$post["accesibilidadCompartirTarea"] && $res[0]["estadoTareaCompartida"]==1){
+                    if(!$tc->updateTCTarea(session()->get("ids")[$post["idTarea"]-1],$data[0]["idUsuario"],$post["accesibilidadCompartirTarea"])){
+                        $tc=null;
+                        return redirect()->to(base_url().'tarea/'.$post["idTarea"])->with("mensaje",["error"=> "", "mensaje"=> "El usuario ya a aceptado la invitacion previamente<br>No se pudo modificar la accesibilidad. Intente nuevamente en unos minutos"]);
+                    }
                 }elseif($res[0]["estadoTareaCompartida"]==1){
                     $tc=null;
                     return redirect()->to(base_url().'tarea/'.$post["idTarea"])->with("mensaje",["error"=> "", "mensaje"=> "El usuario ya a aceptado la invitación previamente"]);
@@ -428,7 +381,9 @@ class Tarea extends BaseController{
                     return redirect()->to(base_url().'tarea/'.$post["idTarea"])->with("mensaje",["error"=> "", "mensaje"=> "La invitación ya a sido enviada previamente<br>El usuario aun tiene que aceptarla"]);
                 }
             }
-            $idTC=$tc->insert($sqlIn,true);
+            $idTC=$tc->insertNewTCTarea($data[0]["idUsuario"],
+                                        $post["accesibilidadCompartirTarea"],
+                                       session()->get("ids")[$post["idTarea"]-1]);
             $tc=null;
             if($idTC){
                 $email=\Config\Services::email();
@@ -462,18 +417,57 @@ class Tarea extends BaseController{
                 return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
             }
             $tc=new TareaCompartidaModel();
-            $res=$tc->select("estadoTareaCompartida")->find($idTC);
-            if(empty($res)){
+            $res=$tc->getEstadoTC($idTC);
+            if(!isset($res)){
+                return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
+            }elseif(empty($res)){
                 return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
             }elseif($res["estadoTareaCompartida"]!=0){
                 return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Esta invitacion ya a sido procesada"]);
             }
-            if(!$tc->update($idTC,["estadoTareaCompartida"=>$estado])){
+            if(!$tc->updateEstadoTC($idTC,$estado)){
                 return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
             }
             return redirect()->to(base_url()."inicio")->with("mensaje",["success"=>"","mensaje"=>"La invitacion se proceso con exito"]);
         }catch(Error $e){
             return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
         }
+    }
+
+    public function eliminarTarea(){
+        try{
+            $idTarea=$this->request->getPost("idTarea");
+            if(isset($idTarea)){
+                if(isset(session()->get("ids")[$idTarea-1])){
+                    $trueIdTarea=session()->get("ids")[$idTarea-1];
+                }else{
+                    return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentar acceder a la tarea"]);
+                }
+                $tareaModel=new TareaModel();
+                if(!$tareaModel->deleteTarea($trueIdTarea)){
+                    $tareaModel=null;
+                    return redirect()->to(base_url()."tarea/".$idTarea)->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentear eliminar la tarea.<br>Intente nuevamente en unos minutos."]);
+                }else{
+                    $TCModel=new TareaCompartidaModel();
+                    $res=$TCModel->deleteTCsTarea($trueIdTarea);
+                    if(!$res){
+                        $i=0;
+                        while(!$res && $i<10){
+                            $res=$TCModel->deleteTCsTarea($trueIdTarea);
+                            $i++;
+                        }
+                        if(!$res){
+                            return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Tarea eliminada con exito.<br>No se pudieron eliminar las relaciones de la tarea"]);
+                        }
+                    }
+                    $tareaModel=null;
+                    return redirect()->to(base_url()."inicio")->with("mensaje",["success"=>"","mensaje"=>"Tarea eliminada con exito"]);
+                }
+            }
+            return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentar obtener la tarea."]);
+        }catch(Error $e){
+            return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error inesperado. Estamos trabajando en ello."]);
+        }
+
     }
 }

@@ -3,9 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\TareaModel;
-use App\Models\UsuarioModel;
-use App\Models\SubTareaModel;
-use App\Models\ComentarioModel;
+use App\Models\TareaCompartidaModel;
 use Error;
 
 class Historial extends BaseController{
@@ -22,22 +20,8 @@ class Historial extends BaseController{
     }
     private function todasLasSubTareas($id){
         try{
-            $db = \Config\Database::connect();
-            $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.descripcionTarea AS descripcion, tareas.prioridadTarea AS prioridad, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, tareas.autorTarea AS autor, NULL AS tipoTC, "tarea" AS tarea_subtarea
-                                        FROM tareas
-                                        LEFT JOIN tareasCompartidas ON tareasCompartidas.idTarea=tareas.idTarea
-                                        WHERE tareas.idTarea = '.session()->get("idsUsuario")[$id-1].'
-                                              AND tareas.tareaArchivada = 1
-                                              AND tareas.autorTarea = '.session()->get("usuario")["id"].'
-                                        UNION
-                                            SELECT subTareas.idSubTarea AS id, "" AS titulo, subTareas.descripcionSubTarea AS descripcion, subTareas.prioridadSubTarea AS prioridad, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, "" AS fechaRecordatorio, subTareas.colorSubTarea AS color, subTareas.autorSubTarea AS autor, NULL AS tipoTC, "subtarea" AS tarea_subtarea
-                                            FROM subTareas
-                                            WHERE subTareas.idTarea = '.session()->get("idsUsuario")[$id-1].'
-                                        ';
-            $sql.=$this->getOrden();
-            $query   = $db->query($sql);
-            $datos["tarea_subTareas"] = $query->getResultArray();
-            $db->close();
+            $tareaModel=new TareaModel();
+            $datos["tarea_subTareas"] = $tareaModel->todasLasSubTareasH(session()->get("idsUsuario")[$id-1],$this->getOrden());
             $aux=[];
             foreach ($datos["tarea_subTareas"] as $tareaOsubtarea) {
                 if($tareaOsubtarea["tarea_subtarea"]=="tarea") continue;
@@ -72,6 +56,7 @@ class Historial extends BaseController{
             case 1: return "Order By id DESC";
             case 2: return "Order By fechaVencimiento";
             case 3: return "Order By prioridad";
+            default: return "Order By id DESC";
         }
     }
     public function modTarea($id){
@@ -90,15 +75,13 @@ class Historial extends BaseController{
                 {
                     return redirect()->to(base_url()."tarea/".$id)->withInput();
                 }
-                $sqlIn=[
-                    "tituloTarea"=>$post["tituloTarea"],
-                    "descripcionTarea"=>$post["descripcionTarea"],
-                    "prioridadTarea"=>$post["prioridadTarea"],
-                    "colorTarea"=>$post["colorTarea"]
-                ];
-                if($post["fechaRecordatorioTarea"]!=null) $sqlIn["fechaRecordatorioTarea"]=$post["fechaRecordatorioTarea"];
                 $tarea=new TareaModel();
-                if($tarea->update(session()->get("idsUsuario")[$id-1],$sqlIn)){
+                if($tarea->updateTarea(session()->get("idsUsuario")[$id-1],
+                                   $post["tituloTarea"],
+                              $post["descripcionTarea"],
+                                $post["prioridadTarea"],
+                                    $post["colorTarea"],
+                        $post["fechaRecordatorioTarea"])){
                     $tarea=null;
                     return redirect()->to(base_url().'tarea/'.$id)->with("mensaje",["success"=> "", "mensaje" => "Tarea modificada!"]);
                 }else{
@@ -116,5 +99,42 @@ class Historial extends BaseController{
     public function subTarea($id){
         if(!isset(session()->get("idsTarea")[$id-1])) return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al ingresar a la subTarea"]);
         else return redirect()->to(base_url()."subtarea/".$id);
+    }
+
+    public function eliminarTarea(){
+        try{
+            $idTarea=$this->request->getPost("idTarea");
+            if(isset($idTarea)){
+                if(session()->get("idsUsuario")[$idTarea-1]){
+                    $trueIdTarea=session()->get("idsUsuario")[$idTarea-1];
+                }else{
+                    return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentar acceder a la tarea"]);
+                }
+                $tareaModel=new TareaModel();
+                if(!$tareaModel->deleteTarea($trueIdTarea)){
+                    $tareaModel=null;
+                    return redirect()->to(base_url()."historial/".$idTarea)->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentear eliminar la tarea.<br>Intente nuevamente en unos minutos."]);
+                }else{
+                    $TCModel=new TareaCompartidaModel();
+                    $res=$TCModel->deleteTCsTarea($trueIdTarea);
+                    if(!$res){
+                        $i=0;
+                        while(!$res && $i<10){
+                            $res=$TCModel->deleteTCsTarea($trueIdTarea);
+                            $i++;
+                        }
+                        if(!$res){
+                            return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Tarea eliminada con exito.<br>No se pudieron eliminar las relaciones de la tarea"]);
+                        }
+                    }
+                    $tareaModel=null;
+                    return redirect()->to(base_url()."inicio")->with("mensaje",["success"=>"","mensaje"=>"Tarea eliminada con exito"]);
+                }
+            }
+            return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentar obtener la tarea."]);
+        }catch(Error $e){
+            return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error inesperado. Estamos trabajando en ello."]);
+        }
+
     }
 }

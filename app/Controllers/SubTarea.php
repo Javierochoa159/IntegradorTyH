@@ -29,33 +29,9 @@ class SubTarea extends BaseController{
     }
     private function todosLosComentarios($id){
         try{
-            $db = \Config\Database::connect();
-            $sql='SELECT subTareas.idSubTarea AS id, subTareas.descripcionSubTarea AS descripcion, subTareas.prioridadSubTarea AS prioridad, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, subTareas.colorSubTarea AS color, subTareas.autorSubTarea AS autor, CASE WHEN tareasCompartidas.tipoTareaCompartida IS NOT NULL THEN tareasCompartidas.tipoTareaCompartida ELSE NULL END AS tipoTC, "subtarea" AS subtarea_comentario
-                                        FROM subTareas
-                                        LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea=subTareas.idSubTarea
-                                        WHERE subTareas.idSubTarea = '.$id.'
-                                                AND (subTareas.autorSubTarea = '.session()->get("usuario")["id"].'
-                                                     OR
-                                                     (tareasCompartidas.estadoTareaCompartida="1" 
-                                                      AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].')
-                                                    )
-                                        UNION
-                                            SELECT comentarios.idComentario AS id, comentarios.comentario AS descripcion, "" AS prioridad, "" AS estado, "" AS fechaVencimiento, "" AS color, comentarios.idUsuario AS autor, NULL AS tipoTC, "comentario" AS subtarea_comentario
-                                            FROM comentarios
-                                            LEFT JOIN subTareas ON subTareas.idSubTarea= comentarios.idSubTarea
-                                            LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea= comentarios.idSubTarea
-                                            WHERE   comentarios.estado = 1
-                                                    AND comentarios.idSubTarea='.$id.'
-                                                    AND (subTareas.autorSubTarea = '.session()->get("usuario")["id"].' 
-                                                         OR
-                                                         (tareasCompartidas.estadoTareaCompartida="1" 
-                                                          AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].')
-                                                        )
-                                        ORDER BY id DESC
-                                        ';
-            $query   = $db->query($sql);
-            $datos["subTarea_comentarios"] = $query->getResultArray();
-            $db->close();
+            $subTareaModel=new SubTareaModel();
+            $datos["subTarea_comentarios"] = $subTareaModel->todosLosComentarios($id);
+            $subTareaModel=null;
             return $datos;
         }
         catch(Error $e){
@@ -84,13 +60,8 @@ class SubTarea extends BaseController{
                 {
                     return redirect()->to(base_url()."subtarea/".$post["idSubTarea"])->withInput();
                 }else{
-                    $sqlIn=[
-                        "idSubTarea"=>$idSubTarea,
-                        "idUsuario"=> session()->get("usuario")["id"],
-                        "comentario"=>$post["comentarioComentario"]
-                    ];
-                    $subTarea=new ComentarioModel();
-                    if(!$subTarea->insert($sqlIn)){
+                    $comentarioModel=new ComentarioModel();
+                    if(!$comentarioModel->insertNewComentario($idSubTarea,$post["comentarioComentario"])){
                         return redirect()->to(base_url().'subtarea/'.$post["idSubTarea"])->with("mensaje",["error"=> "", "mensaje"=> "Error al crear el comentario"]);
                     }else{
                         return redirect()->to(base_url().'subtarea/'.$post["idSubTarea"])->with("mensaje",["success"=> "", "mensaje" => "Comentario creado!"]);
@@ -124,13 +95,11 @@ class SubTarea extends BaseController{
                 {
                     return redirect()->to(base_url()."subtarea/".$id)->withInput();
                 }
-                $sqlIn=[
-                    "descripcionSubTarea"=>$post["descripcionSubTarea"],
-                    "prioridadSubTarea"=>$post["prioridadSubTarea"],
-                    "colorSubTarea"=>$post["colorSubTarea"]
-                ];
                 $subTarea=new SubTareaModel();
-                if(!$subTarea->update($idSubTarea,$sqlIn)){
+                if(!$subTarea->updateSubTarea($idSubTarea,
+                                     $post["descripcionSubTarea"],
+                                       $post["prioridadSubTarea"],
+                                           $post["colorSubTarea"])){
                     $subTarea=null;
                     return redirect()->to(base_url().'subtarea/'.$id)->with("mensaje",["error"=> "", "mensaje"=> "Error al modificar la subTarea<br>Intente nuevamente en unos minutos"]);
                 }
@@ -164,14 +133,14 @@ class SubTarea extends BaseController{
                     return redirect()->to(base_url()."subtarea/".$id)->withInput();
                 }
                 $subTarea=new SubTareaModel();
-                $viejaDesc=$subTarea->select("descripcionSubTarea")->find($idSubTarea);
+                $viejaDesc=$subTarea->getDescripcionSubTarea($idSubTarea);
                 if(!isset($viejaDesc)){
                     return redirect()->to(base_url().'subtarea/'.$id)->with("mensaje",["error"=> "", "mensaje"=> "Error al modificar la subTarea<br>Intente nuevamente en unos minutos"]);
                 }
                 if(empty($viejaDesc)){
                     return redirect()->to(base_url().'subtarea/'.$id)->with("mensaje",["error"=> "", "mensaje"=> "Error al modificar la subTarea<br>Intente nuevamente en unos minutos"]);
                 }
-                if(!$subTarea->update($idSubTarea,["descripcionSubTarea"=>$post["descripcionSubTarea"]."<br>".$viejaDesc["descripcionSubTarea"]])){
+                if(!$subTarea->anexarSubTarea($idSubTarea,$viejaDesc["descripcionSubTarea"],$post["descripcionSubTarea"])){
                     $subTarea=null;
                     return redirect()->to(base_url().'subtarea/'.$id)->with("mensaje",["error"=> "", "mensaje"=> "Error al modificar la subTarea<br>Intente nuevamente en unos minutos"]);
                 }
@@ -195,25 +164,56 @@ class SubTarea extends BaseController{
             }
             if(isset($idSubTarea)){
                 $subtarea=new SubTareaModel();
-                $estado=$subtarea->select("estadoSubTarea")->find($idSubTarea);
+                $estado=$subtarea->getEstadoSubTarea($idSubTarea);
                 if($estado!=null){
                     switch($estado["estadoSubTarea"]){
-                        case 1: if(!$subtarea->update($idSubTarea,["estadoSubTarea"=>"2"])){
+                        case 1: if(!$subtarea->updateEstadoSubTarea($idSubTarea,"2")){
                                     $subtarea=null;
                                     return redirect()->to(base_url()."subtarea/".$id)->with("error",["mensaje"=>"No se pudo modificar el estado de la SubTarea<br>Intente nuevamente en unos minutos"]);
                                 }
                                 $subtarea=null;
-                                return redirect()->to(base_url()."subtarea/".$id)->with("success",["mensaje"=>"Estado modificado con exito"]);
-                        case 2: if(!$subtarea->update($idSubTarea,["estadoSubTarea"=>"3"])){
+                                $tareaModel=new TareaModel();
+                                $idTarea=$tareaModel->getIdTareaSubTarea($idSubTarea);
+                                if(isset($idTarea[0]["idTarea"])){
+                                    $estadoTarea=$tareaModel->getEstadoTarea($idTarea[0]["idTarea"]);
+                                    if(isset($estadoTarea["estadoTarea"])){
+                                        if($estadoTarea["estadoTarea"]==1){
+                                            $res=$tareaModel->updateEstadoTarea($idTarea[0]["idTarea"],"2");
+                                            if(!$res){
+                                                $i=0;
+                                                while(!$res && $i<10){
+                                                    $res=$tareaModel->updateEstadoTarea($idTarea[0]["idTarea"],"2");
+                                                    $i++;
+                                                }
+                                                if(!$res){
+                                                    return redirect()->to(base_url()."subtarea/".$id)->with("error",["mensaje"=>"El estado de la SubTarea fue modificado con exito<br>Ocurrio un error al actualizar el estado de la Tarea"]);
+                                                }
+                                            }
+                                        }
+                                        return redirect()->to(base_url()."subtarea/".$id)->with("success",["mensaje"=>"Estado modificado con exito"]);
+                                    }else{
+                                        return redirect()->to(base_url()."subtarea/".$id)->with("error",["mensaje"=>"El estado de la SubTarea fue modificado con exito<br>Ocurrio un error al actualizar el estado de la Tarea"]);
+                                    }
+                                }else{
+                                    return redirect()->to(base_url()."subtarea/".$id)->with("error",["mensaje"=>"El estado de la SubTarea fue modificado con exito<br>Ocurrio un error al actualizar el estado de la Tarea"]);
+                                }
+                        case 2: if(!$subtarea->updateEstadoSubTarea($idSubTarea,"3")){
                                     $subtarea=null;
                                     return redirect()->to(base_url()."subtarea/".$id)->with("error",["mensaje"=>"No se pudo modificar el estado de la SubTarea<br>Intente nuevamente en unos minutos"]);
                                 }
-                                $idUsuarioSubTarea=$subtarea->select("autorSubTarea")->find($idSubTarea);
+                                $idUsuarioSubTarea=$subtarea->getAutorSubTarea($idSubTarea);
                                 $subtarea=null;
                                 $tareaComp=new TareaCompartidaModel();
-                                $res=$tareaComp->where("idSubTarea=".$idSubTarea." AND estadoTareaCompartida='1'")->update(null,["estadoTareaCompartida"=>'3']);
-                                while(!$res){
-                                    $res=$tareaComp->where("idSubTarea=".$idSubTarea." AND estadoTareaCompartida='1'")->update(null,["estadoTareaCompartida"=>'3']);
+                                $res=$tareaComp->finalizarTCSubTarea($idSubTarea);
+                                if(!$res){
+                                    $i=0;
+                                    while(!$res&&$i<10){
+                                        $res=$tareaComp->finalizarTCSubTarea($idSubTarea);
+                                        $i++;
+                                    }
+                                    if(!$res){
+                                        return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"SubTarea finalizada con exito.<br>No se pudo finalizar la subTarea para los usuarios compartidos"]);
+                                    }
                                 }
                                 $tareaComp=null;
                                 if(isset($idUsuarioSubTarea)){
@@ -249,7 +249,7 @@ class SubTarea extends BaseController{
             $user=new UsuarioModel();
             $data=[];        
             $mensaje=array();
-            $data=$user->select("idUsuario, emailUsuario")->where('usuarioUsuario',$post["usuarioCompartirSubTarea"])->find();
+            $data=$user->getIdEmailUser($post["usuarioCompartirSubTarea"]);
             $user=null;
             if(empty($data)){
                 $mensaje["usuarioCompartirSubTarea"]="El usuario ingresado no existe.";
@@ -260,23 +260,20 @@ class SubTarea extends BaseController{
                 return redirect()->back()->withInput()->with('mensaje',$mensaje);
             }
             $tarea=new TareaModel();
-            $idTarea=$tarea->select("tareas.idTarea")->join("subTareas","subTareas.idTarea=tareas.idTarea")->where("subTareas.idSubTarea=".session()->get("idsTarea")[$post["idSubTarea"]-1])->find();
+            $idTarea=$tarea->getIdTareaSubTarea(session()->get("idsTarea")[$post["idSubTarea"]-1]);
             if(empty($idTarea)){
                 return redirect()->to("subTarea/".$post["idSubTarea"])->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentar compartir la subTarea.<br>Intente nuevamente en unos minutos."]);
             }
-            $sqlIn=[
-                "idUsuario" =>$data[0]["idUsuario"],
-                "idTarea" =>$idTarea[0]["idTarea"],
-                "tipoTareaCompartida"=>$post["accesibilidadCompartirSubTarea"],
-                "idSubTarea"=>session()->get("idsTarea")[$post["idSubTarea"]-1]
-            ];
             $tc=new TareaCompartidaModel();
-            $res=$tc->select("tipoTareaCompartida, estadoTareaCompartida")->where("idTarea=".$idTarea[0]["idTarea"]." AND idSubTarea=".session()->get("idsTarea")[$post["idSubTarea"]-1]." AND idUsuario=".$data[0]["idUsuario"])->find();
+            $res=$tc->getTCSubTarea($idTarea[0]["idTarea"],
+                                     $data[0]["idUsuario"],
+                                 session()->get("idsTarea")[$post["idSubTarea"]-1]);
             if(!empty($res)){
-                if($res[0]["tipoTareaCompartida"]!=$sqlIn["tipoTareaCompartida"] && $res[0]["estadoTareaCompartida"]==1){
-                    if(!$tc->where("idSubTarea=".session()->get("idsTarea")[$post["idSubTarea"]-1]." AND idUsuario=".$data[0]["idUsuario"])->update(null,["tipoTareaCompartida"=>$sqlIn['tipoTareaCompartida']]))
-                    $tc=null;
-                    return redirect()->to(base_url().'subtarea/'.$post["idSubTarea"])->with("mensaje",["error"=> "", "mensaje"=> "El usuario ya a aceptado la invitacion previamente<br>No se pudo modificar la accesibilidad. Intente nuevamente en unos minutos"]);
+                if($res[0]["tipoTareaCompartida"]!=$post["accesibilidadCompartirSubTarea"] && $res[0]["estadoTareaCompartida"]==1){
+                    if(!$tc->updateTCSubTarea($res[0]["idTareaCompartida"],$post["accesibilidadCompartirSubTarea"])){
+                        $tc=null;
+                        return redirect()->to(base_url().'subtarea/'.$post["idSubTarea"])->with("mensaje",["error"=> "", "mensaje"=> "El usuario ya a aceptado la invitacion previamente<br>No se pudo modificar la accesibilidad. Intente nuevamente en unos minutos"]);
+                    }
                 }elseif($res[0]["estadoTareaCompartida"]==1){
                     $tc=null;
                     return redirect()->to(base_url().'subtarea/'.$post["idSubTarea"])->with("mensaje",["error"=> "", "mensaje"=> "El usuario ya a aceptado la invitación previamente"]);
@@ -285,7 +282,10 @@ class SubTarea extends BaseController{
                     return redirect()->to(base_url().'subtarea/'.$post["idSubTarea"])->with("mensaje",["error"=> "", "mensaje"=> "La invitación ya a sido enviada previamente<br>El usuario aun tiene que aceptarla"]);
                 }
             }
-            $idTC=$tc->insert($sqlIn,true);
+            $idTC=$tc->insertNewTCSubTarea($data[0]["idUsuario"],
+                                           $post["accesibilidadCompartirSubTarea"],
+                                          $idTarea[0]["idTarea"],
+                                       session()->get("idsTarea")[$post["idSubTarea"]-1]);
             $tc=null;
             if($idTC){
                 $email=\Config\Services::email();
@@ -295,6 +295,10 @@ class SubTarea extends BaseController{
                 $email->setSubject("Invitacion a SubTarea");
                 $email->setMessage("Has recibido una invitacion a una subtarea en tu cuenta<br><a href='".base_url()."/subtarea/procesarshare/".$idTC."/1'>Aceptar</a><a href='".base_url()."/subtarea/procesarshare/".$idTC."/2'>Rechazar</a>");
                 if(!$email->send()){
+                    $i=0;
+                    while(!$email->send() && $i<10){
+                        $i++;
+                    }
                     return redirect()->to(base_url()."subtarea/".$post["idSubTarea"])->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al enviar la invitacion<br>Intente nuevamente en unos minutos"]);
                 }
                 return redirect()->to(base_url()."subtarea/".$post["idSubTarea"])->with("mensaje",["success"=>"","mensaje"=>"Invitacion a la subtarea enviada exitosamente"]);
@@ -314,13 +318,15 @@ class SubTarea extends BaseController{
                 return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
             }
             $tc=new TareaCompartidaModel();
-            $res=$tc->select("estadoTareaCompartida")->find($idTC);
-            if(empty($res)){
+            $res=$tc->getEstadoTC($idTC);
+            if(!isset($res)){
+                return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
+            }elseif(empty($res)){
                 return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
             }elseif($res["estadoTareaCompartida"]!=0){
                 return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Esta invitacion ya a sido procesada"]);
             }
-            if(!$tc->update($idTC,["estadoTareaCompartida"=>$estado])){
+            if(!$tc->updateEstadoTC($idTC,$estado)){
                 return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
             }
             return redirect()->to(base_url()."inicio")->with("mensaje",["success"=>"","mensaje"=>"La invitacion se proceso con exito"]);
@@ -334,14 +340,14 @@ class SubTarea extends BaseController{
                 return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
             }
             $tc=new TareaCompartidaModel();
-            $res=$tc->select("estadoTareaCompartida")->find($idTC);
+            $res=$tc->getEstadoTC($idTC);
             if(empty($res)){
                 return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
             }elseif($res["estadoTareaCompartida"]!=0){
                 return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Esta invitacion ya a sido procesada"]);
             }
             if($estado==1){
-                $idSubTarea=$tc->select("idSubTarea, idUsuario")->find($idTC);
+                $idSubTarea=$tc->getIdSubTareaIdUserTC($idTC);
                 if(!isset($idSubTarea)){
                     return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
                 }
@@ -349,34 +355,49 @@ class SubTarea extends BaseController{
                     return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
                 }
                 switch ($estadoTC){
-                case 0: if(!$tc->update($idTC,["estadoTareaCompartida"=>$estado])){
+                case 0: if(!$tc->updateEstadoTC($idTC,$estado)){
                             $tc=null;
                             return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
                         }
                         $tc=null;
                         $subTarea=new SubTareaModel();
-                        $res=$subTarea->update($idSubTarea["idSubTarea"],["responsableSubTarea"=>$idSubTarea["idUsuario"]]);
-                        while(!$res){
-                            $res=$subTarea->update($idSubTarea["idSubTarea"],["responsableSubTarea"=>$idSubTarea["idUsuario"]]);
+                        $res=$subTarea->updateResponsableSubTarea($idSubTarea["idSubTarea"],$idSubTarea["idUsuario"]);
+                        if(!$res){
+                            $i=0;
+                            while(!$res && $i<10){
+                                $res=$subTarea->updateResponsableSubTarea($idSubTarea["idSubTarea"],$idSubTarea["idUsuario"]);
+                                $i++;
+                            }
+                            if(!$res){
+                                $subTarea=null;
+                                return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"La invitacion se proceso con exito<br>Ocurrio un error al momento de asignar la responsabilidad"]);
+                            }
                         }
                         $subTarea=null;
                         return redirect()->to(base_url()."inicio")->with("mensaje",["success"=>"","mensaje"=>"La invitacion se proceso con exito"]);
                 
-                case 1: if(!$tc->update($idTC,["tipoTareaCompartida"=>"3"])){
+                case 1: if(!$tc->updateTCSubTarea($idTC,"3")){
                             $tc=null;
                             return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
                         }
                         $tc=null;
                         $subTarea=new SubTareaModel();
-                        $res=$subTarea->update($idSubTarea["idSubTarea"],["responsableSubTarea"=>$idSubTarea["idUsuario"]]);
-                        while(!$res){
-                            $res=$subTarea->update($idSubTarea["idSubTarea"],["responsableSubTarea"=>$idSubTarea["idUsuario"]]);
+                        $res=$subTarea->updateResponsableSubTarea($idSubTarea["idSubTarea"],$idSubTarea["idUsuario"]);
+                        if(!$res){
+                            $i=0;
+                            while(!$res && $i<10){
+                                $res=$subTarea->updateResponsableSubTarea($idSubTarea["idSubTarea"],$idSubTarea["idUsuario"]);
+                                $i++;
+                            }
+                            if(!$res){
+                                return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de asignar la responsabilidad"]);
+                            }
                         }
                         $subTarea=null;
                         return redirect()->to(base_url()."inicio")->with("mensaje",["success"=>"","mensaje"=>"La invitacion se proceso con exito"]);
                 }
             }else{
-                if(!$tc->update($idTC,["estadoTareaCompartida"=>$estado])){
+                if(!$tc->updateEstadoTC($idTC,$estado)){
                     $tc=null;
                     return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
                 }
@@ -385,6 +406,46 @@ class SubTarea extends BaseController{
             }
         }catch(Error $e){
             return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al momento de procesar la invitacion"]);
+        }
+    }
+
+    public function eliminarSubTarea(){
+        try{
+            $idSubTarea=$this->request->getPost("idSubTarea");
+            if(isset($idSubTarea)){
+                if(isset(session()->get("idsTarea")[$idSubTarea-1])){
+                    $trueIdSubTarea=session()->get("idsTarea")[$idSubTarea-1];
+                }elseif(session()->get("idsUsuario")[$idSubTarea-1]){
+                    $trueIdSubTarea=session()->get("idsUsuario")[$idSubTarea-1];
+                }else{
+                    return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentar acceder a la subTarea"]);
+                }
+                $subTareaModel=new SubTareaModel();
+                if(!$subTareaModel->deleteSubTarea($trueIdSubTarea)){
+                    $subTareaModel=null;
+                    return redirect()->to(base_url()."tarea/".$idSubTarea)->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentear eliminar la subTarea.<br>Intente nuevamente en unos minutos."]);
+                }else{
+                    $subTareaModel=null;
+                    $TCModel=new TareaCompartidaModel();
+                    $res=$TCModel->deleteTCsSubTarea($trueIdSubTarea);
+                    if(!$res){
+                        $i=0;
+                        while(!$res && $i<10){
+                            $res=$TCModel->deleteTCsSubTarea($trueIdSubTarea);
+                            $i++;
+                        }
+                        if(!$res){
+                            $TCModel=null;
+                            return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"SubTarea eliminada con exito.<br>No se pudieron eliminar las relaciones de la subTarea"]);
+                        }
+                    }
+                    $TCModel=null;
+                    return redirect()->to(base_url()."inicio")->with("mensaje",["success"=>"","mensaje"=>"SubTarea eliminada con exito"]);
+                }
+            }
+            return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentar obtener la subTarea."]);
+        }catch(Error $e){
+            return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error inesperado. Estamos trabajando en ello."]);
         }
     }
 }

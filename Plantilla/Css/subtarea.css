@@ -160,6 +160,9 @@ select.light{
 #newComentarioModal .modal-content{
     min-width: 35vw;
 }
+#eliminarSubTareaModal .modal-content{
+    min-width: 35vw;
+}
 
 .dropdown button.dropdown-toggle::after{
     content: none;

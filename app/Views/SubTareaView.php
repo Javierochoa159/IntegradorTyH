@@ -78,10 +78,39 @@
                                 <li>
                                     <a class="dropdown-item text-reset text-decoration-none" href="<?php  echo base_url()."subtarea/estadosubtarea/".$idSubTarea;?>"><?php if($subTareaOcomentario["estado"] == "1") echo "Empezar";elseif($subTareaOcomentario["estado"] == "2") echo "Finalizar";?></a>
                                 </li><?php }?>
+                                <?php if($subTareaOcomentario["autor"]==session()->get("usuario")["id"]){?>
+                                <li>
+                                    <p id="botonEliminarSubTarea" class="dropdown-item text-reset text-decoration-none mb-0" data-bs-toggle="modal" data-bs-target="#eliminarSubTareaModal">Eliminar</p>
+                                </li>
+                                <?php }?>
                             </ul>
                         </div>
                         
                     </div>
+                    <?php if($subTareaOcomentario["autor"]==session()->get("usuario")["id"]){?>
+                        <div class="modal fade" id="eliminarSubTareaModal" tabindex="-1" aria-labelledby="eliminarSubTareaModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content dark">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="eliminarSubTareaModalLabel">Eliminar SubTarea</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="deleteSubTarea" action="<?= base_url()."subtarea/eliminarsubtarea"?>" method="post">
+                                           <div class="mb-3">
+                                                <h3>Seguro que desea eliminar la SubTarea?</h3>
+                                            </div>
+                                            <input type="number" name="idSubTarea" value="<?= $idSubTarea?>" hidden>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="reset" form="deleteSubTarea" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" form="deleteSubTarea" class="btn btn-primary">Eliminar</button>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php }?>
                     <div class="modal fade" id="modSubTareaModal" tabindex="-1" aria-labelledby="modSubTareaModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content dark">

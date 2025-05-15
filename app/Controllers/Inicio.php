@@ -13,8 +13,8 @@ Class Inicio extends BaseController{
     public function index(){
         if(session()->has("usuario")){
             try{
-                $user=new UsuarioModel();
-                $user->select("idUsuario")->find(session()->get("usuario")["id"]);
+                $userModel=new UsuarioModel();
+                $user=$userModel->getIdUsuario();
                 if(empty($user)){
                     session()->destroy();
                     redirect()->to(base_url()."login");
@@ -51,17 +51,13 @@ Class Inicio extends BaseController{
             {
                 return redirect()->to(base_url()."inicio")->withInput();
             }
-            $sqlIn=[
-                "tituloTarea"=>$post["tituloTarea"],
-                "descripcionTarea"=>$post["descripcionTarea"],
-                "prioridadTarea"=>$post["prioridadTarea"],
-                "colorTarea"=>$post["colorTarea"],
-                "fechaVencimientoTarea"=>$post["fechaVencimientoTarea"],
-                "autorTarea"=> session()->get("usuario")["id"]
-            ];
-            if($post["fechaRecordatorioTarea"]!=null) $sqlIn["fechaRecordatorioTarea"]=$post["fechaRecordatorioTarea"];
             $tarea=new TareaModel();
-            if($tarea->insert($sqlIn)){
+            if($tarea->insertNewTarea($post["tituloTarea"],
+                                 $post["descripcionTarea"],
+                                   $post["prioridadTarea"],
+                                       $post["colorTarea"],
+                            $post["fechaVencimientoTarea"],
+                           $post["fechaRecordatorioTarea"])){
                 $tarea=null;
                 return redirect()->to(base_url().'inicio')->with("mensaje",["success"=> "", "mensaje" => "Tarea creada!"]);
             }else{
@@ -106,32 +102,13 @@ Class Inicio extends BaseController{
             case 1: return "Order By id DESC";
             case 2: return "ORDER BY prioridadOrdenada DESC, fechaVencimiento ASC";
             case 3: return "Order By fechaVencimiento";
+            default: return "Order By id DESC";
         }
     }
     private function todasLasTareas(){
         try{
-            $db = \Config\Database::connect();
-            $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.prioridadTarea AS prioridad, tareas.prioridadTarea AS prioridadOrdenada, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, tareas.recordatorioNotificado AS recoNotify, tareas.autorTarea AS autor, "tarea" AS tarea_subtarea
-                                            FROM tareas
-                                            LEFT JOIN tareasCompartidas ON tareasCompartidas.idTarea=tareas.idTarea
-                                            WHERE    (tareas.autorTarea = '.session()->get("usuario")["id"].' AND tareas.tareaArchivada = 0)
-                                                  OR (tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].' AND tareasCompartidas.estadoTareaCompartida = "1" AND tareasCompartidas.idSubTarea IS NULL)
-                                            UNION
-                                                SELECT subTareas.idSubTarea AS id, subTareas.descripcionSubTarea AS titulo, subTareas.prioridadSubTarea AS prioridad,CASE 
-                                                    WHEN subTareas.prioridadSubTarea = 4 THEN 3
-                                                    WHEN subTareas.prioridadSubTarea = 3 THEN 2 
-                                                    WHEN subtareas.prioridadSubTarea = 2 THEN 1
-                                                    WHEN subtareas.prioridadSubTarea = 1 THEN 0
-                                                END AS prioridadOrdenada, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, NULL AS fechaRecordatorio, subTareas.colorSubTarea AS color, NULL AS recoNotify, subTareas.autorSubTarea AS autor, "subtarea" AS tarea_subtarea
-                                                FROM subTareas
-                                                LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea=subTareas.idSubTarea
-                                                WHERE tareasCompartidas.estadoTareaCompartida="1"
-                                                      AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].' 
-                                            ';
-            $sql.=$this->getOrden();
-            $query   = $db->query($sql);
-            $datos["tareas"] = $query->getResultArray();
-            $db->close();
+            $tareaModel=new TareaModel();
+            $datos["tareas"]= $tareaModel->getTodasLasTareas($this->getOrden());
             $aux=[];
             foreach($datos["tareas"] as $tarea){
                 $aux[]=$tarea["id"];
@@ -151,7 +128,7 @@ Class Inicio extends BaseController{
     }
     private function notificarRecordatorio($tarea){
         $user=new UsuarioModel();
-        $userEmail=$user->select("emailUsuario")->find($tarea["autor"]);
+        $userEmail=$user->getEmailUser($tarea["autor"]);
         $user=null;
         if(isset($userEmail)){
             if(!empty($userEmail)){
@@ -163,7 +140,7 @@ Class Inicio extends BaseController{
                 $email->setMessage("La fecha de vencimiento de la tarea '".$tarea["titulo"]."' se acerca.<br>Vence el ".substr($tarea["fechaVencimiento"],0,-3));
                 if($email->send()){
                     $tareas=new TareaModel();
-                    if($tareas->update($tarea["id"],["recordatorioNotificado"=>true])){
+                    if($tareas->recordatorioTarea($tarea["id"],true)){
                         $tarea["recoNotify"]=1;
                     }
                     $tareas=null;
@@ -173,16 +150,8 @@ Class Inicio extends BaseController{
     }
     private function todasMisTareasActivas(){
         try{
-            $db = \Config\Database::connect();
-            $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.prioridadTarea AS prioridad, tareas.prioridadTarea AS prioridadOrdenada, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, "tarea" AS tarea_subtarea
-                                            FROM tareas
-                                            WHERE tareas.autorTarea = '.session()->get("usuario")["id"].'
-                                                  AND tareas.tareaArchivada = 0
-                                            ';
-            $sql.=$this->getOrden();
-            $query   = $db->query($sql);
-            $datos["tareas"] = $query->getResultArray();
-            $db->close();
+            $tareaModel=new TareaModel();
+            $datos["tareas"] = $tareaModel->todasMisTareasActivas($this->getOrden());
             $aux=[];
             foreach($datos["tareas"] as $tarea){
                 $i=array_find_key(session()->get("ids"),function($value)use($tarea){return $tarea["id"]===$value;});
@@ -198,29 +167,8 @@ Class Inicio extends BaseController{
     }
     public function todasLasTareasCompartidas(){
         try{
-            $db = \Config\Database::connect();
-            $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.prioridadTarea AS prioridad, tareas.prioridadTarea AS prioridadOrdenada, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, "tarea" AS tarea_subtarea
-                                        FROM tareas
-                                        LEFT JOIN tareasCompartidas ON tareasCompartidas.idTarea=tareas.idTarea
-                                        WHERE tareasCompartidas.estadoTareaCompartida = "1"
-                                              AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].'
-                                              AND tareasCompartidas.idSubTarea IS NULL
-                                        UNION
-                                            SELECT subTareas.idSubTarea AS id, subTareas.descripcionSubTarea AS titulo, subTareas.prioridadSubTarea AS prioridad,CASE 
-                                                    WHEN subTareas.prioridadSubTarea = 4 THEN 3
-                                                    WHEN subTareas.prioridadSubTarea = 3 THEN 2 
-                                                    WHEN subtareas.prioridadSubTarea = 2 THEN 1
-                                                    WHEN subtareas.prioridadSubTarea = 1 THEN 0
-                                                END AS prioridadOrdenada, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, "" AS fechaRecordatorio, subTareas.colorSubTarea AS color, "subtarea" AS tarea_subtarea
-                                            FROM subTareas
-                                            LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea=subTareas.idSubTarea
-                                            WHERE tareasCompartidas.estadoTareaCompartida = "1"
-                                                  AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].'
-                                        ';
-            $sql.=$this->getOrden();
-            $query   = $db->query($sql);
-            $datos["tareas"] = $query->getResultArray();
-            $db->close();
+            $tareaModel=new TareaModel();
+            $datos["tareas"] = $tareaModel->todasLasTareasCompartidas($this->getOrden());
             $aux=[];
             foreach($datos["tareas"] as $tarea){
                 $i=array_find_key(session()->get("ids"),function($value)use($tarea){return $tarea["id"]===$value;});
@@ -237,16 +185,8 @@ Class Inicio extends BaseController{
 
     private function todasMisTareas(){
         try{
-            $db = \Config\Database::connect();
-            $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.prioridadTarea AS prioridad, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, "tarea" AS tarea_subtarea
-                                            FROM tareas
-                                            WHERE tareas.autorTarea = '.session()->get("usuario")["id"].'
-                                                  AND tareas.tareaArchivada = 1
-                                            ';
-            $sql.=$this->getOrden();
-            $query   = $db->query($sql);
-            $datos["tareas"] = $query->getResultArray();
-            $db->close();
+            $tareaModel=new TareaModel();
+            $datos["tareas"] = $tareaModel->todasMisTareas($this->getOrden());
             $aux=[];
             foreach($datos["tareas"] as $tarea){
                 $aux[]=$tarea["id"];

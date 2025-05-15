@@ -39,6 +39,7 @@ $routes->get('/tarea/subtarea/(:num)', 'Tarea::subTarea/$1');
 $routes->post('/tarea/sharetarea', 'Tarea::shareTarea');
 $routes->get('/tarea/procesarshare/(:num)/(:num)', 'Tarea::procesarShare/$1/$2');
 $routes->get('/tarea/archivartarea/(:num)', 'Tarea::archivarTarea/$1');
+$routes->post('/tarea/eliminartarea', 'Tarea::eliminarTarea');
 
 $routes->get('/subtarea/(:num)', 'SubTarea::index/$1');
 $routes->post('/subtarea/newcomentario', 'SubTarea::newComentario');
@@ -49,6 +50,8 @@ $routes->post('/subtarea/sharesubtarea', 'SubTarea::shareSubTarea');
 $routes->get('/subtarea/procesarshare/(:num)/(:num)', 'SubTarea::procesarShare/$1/$2');
 $routes->get('/subtarea/procesarresponsable/(:num)/(:num)', 'SubTarea::procesarResponsable/$1/$2');
 $routes->get('/subtarea/procesarresponsable/(:num)/(:num)/(:num)', 'SubTarea::procesarResponsable/$1/$2/$3');
+$routes->post('/subtarea/eliminarsubtarea', 'SubTarea::eliminarSubTarea');
 
 $routes->get('/historial/(:num)', 'Historial::index/$1');
 $routes->get('/historial/subtarea/(:num)', 'Historial::subTarea/$1');
+$routes->post('/historial/eliminartarea', 'Historial::eliminarTarea');
