@@ -7,8 +7,8 @@ class TareaModel extends Model{
     protected $primaryKey = 'idTarea';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-    protected $useSoftDeletes = false;
-    protected $allowedFields = ['tituloTarea', 'descripcionTarea','prioridadTarea','estadoTarea','fechaVencimientoTarea','fechaRecordatorioTarea','colorTarea','recordatorioNotificado','tareaArchivada','autorTarea'];
+    protected $useSoftDeletes = true;
+    protected $allowedFields = ['tituloTarea', 'descripcionTarea','prioridadTarea','estadoTarea','fechaVencimientoTarea','fechaRecordatorioTarea','colorTarea','recordatorioNotificado','tareaArchivada','autorTarea','deleted_at'];
     protected bool $updateOnlyChanged = true;
     protected $useTimestamps = false;
     protected $dateFormat = 'datetime';

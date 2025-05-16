@@ -15,7 +15,7 @@
         </a>
     </div>
     <div class="col-3 pe-3 d-flex justify-content-end">
-            <div id="dark_light" class="btn btn-primary"><img src="https://img.icons8.com/?size=100&id=8gmhfnYGKE8G&format=png&color=000000" alt="dark" onclick="dark_light(event)"></div>
+            <div id="dark_light" class="btn btn-primary me-3"><img src="https://img.icons8.com/?size=100&id=8gmhfnYGKE8G&format=png&color=000000" alt="dark" onclick="dark_light(event)"></div>
             <a href="<?= base_url()."inicio/logout"?>" class="dark">Salir</a>
         </div>
     </header>
@@ -39,7 +39,7 @@
             </a>
         </aside>
         <div class="principalDiv">
-            <div class="crearTarea d-flex align-items-center justify-content-between">
+            <div class="col-11 crearTarea d-flex align-items-center justify-content-between">
                 <div class="col-6 d-flex align-items-center">
                     <?php $mensaje=session()->getFlashdata("mensaje"); ?>
                     <h5 class="dark m-0 ms-4 border-bottom border-<?php if(isset($mensaje["success"]))echo "success";else echo "danger";?>"><?php if(isset($mensaje["mensaje"])) echo $mensaje["mensaje"];?></h5>

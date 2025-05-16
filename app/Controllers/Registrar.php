@@ -28,7 +28,7 @@ Class Registrar extends BaseController{
         }
         $user=new UsuarioModel();
         $mensaje=array();
-        $data=$user->getUsuarioAtUserName($post["user"]);
+        $data=$user->getIdUsuarioAtUserName($post["user"]);
         if(!empty($data)){
             $mensaje["user"]= "El usuario ingresado ya está en uso.";
         }

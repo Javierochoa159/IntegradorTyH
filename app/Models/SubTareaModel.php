@@ -7,8 +7,8 @@ class SubTareaModel extends Model{
     protected $primaryKey = 'idSubTarea';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-    protected $useSoftDeletes = false;
-    protected $allowedFields = ['descripcionSubTarea','estadoSubTarea','prioridadSubTarea','fechaVencimientoSubTarea','colorSubTarea','responsableSubTarea','autorSubTarea','idTarea'];
+    protected $useSoftDeletes = true;
+    protected $allowedFields = ['descripcionSubTarea','estadoSubTarea','prioridadSubTarea','fechaVencimientoSubTarea','colorSubTarea','responsableSubTarea','autorSubTarea','idTarea','deleted_at'];
     protected bool $updateOnlyChanged = true;
     protected $useTimestamps = false;
     protected $dateFormat = 'datetime';

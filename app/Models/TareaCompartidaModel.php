@@ -5,10 +5,10 @@ use CodeIgniter\Model;
 class TareaCompartidaModel extends Model{
     protected $table = "TareasCompartidas";
     protected $primaryKey = 'idTareaCompartida';
-    protected $useAutoIncrement=true;
-    protected $allowedFields = ['idTarea','idSubTarea','idUsuario','tipoTareaCompartida','estadoTareaCompartida'];
+    protected $useAutoIncrement = true;
+    protected $useSoftDeletes = true;
+    protected $allowedFields = ['idTarea','idSubTarea','idUsuario','tipoTareaCompartida','estadoTareaCompartida','deleted_at'];
     protected $returnType = 'array';
-    protected $useSoftDeletes = false;
     protected bool $updateOnlyChanged = true;
 
     public function insertNewTCSubTarea($idUser,$tipoTC,$idTarea,$idSubTarea){

@@ -7,8 +7,8 @@ class ComentarioModel extends Model{
     protected $primaryKey = 'idComentario';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-    protected $useSoftDeletes = false;
-    protected $allowedFields = ['idSubTarea','idUsuario','comentario','estado'];
+    protected $useSoftDeletes = true;
+    protected $allowedFields = ['idSubTarea','idUsuario','comentario','estado','deleted_at'];
     protected bool $updateOnlyChanged = true;
 
     public function insertNewComentario($idSubTarea,$comentarioSubTarea){

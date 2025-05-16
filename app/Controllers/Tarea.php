@@ -31,7 +31,7 @@ class Tarea extends BaseController{
                 return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error inesperado al momento de crear una SubTarea<br>Intentelo nuevamente en unos minutos"]);
             }else{
                 $tarea=new TareaModel();
-                $idAutorT = $tarea->getAutorTarea(session()->get("ids")[$this->request->getPost("idTarea")]);
+                $idAutorT = $tarea->getAutorTarea(session()->get("ids")[$this->request->getPost("idTarea")-1]);
                 $tarea=null;
                 if(isset($idAutorT)){
                     if(!empty($idAutorT)){

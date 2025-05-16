@@ -15,25 +15,25 @@
         </a>
     </div>
     <div class="col-3 pe-3 d-flex justify-content-end">
-            <div id="dark_light" class="btn btn-primary"><img src="https://img.icons8.com/?size=100&id=8gmhfnYGKE8G&format=png&color=000000" alt="dark" onclick="dark_light(event)"></div>
+            <div id="dark_light" class="btn btn-primary me-3"><img src="https://img.icons8.com/?size=100&id=8gmhfnYGKE8G&format=png&color=000000" alt="dark" onclick="dark_light(event)"></div>
             <a href="<?= base_url()."inicio/logout"?>" class="dark">Salir</a>
         </div>
     </header>
     <section class="col-12 d-flex">
         <aside class="d-flex flex-column justify-content-start">
-            <a href="<?= base_url()."inicio"?>" class="col-12 text-decoration-none text-reset mb-3 bg-azulito<?php if(isset($pagina)) echo "No"; ?> rounded-end-pill d-flex justify-content-start align-items-center">
+            <a href="<?= base_url()."inicio"?>" class="col-12 text-decoration-none text-reset mb-3 bg-azulitoNo rounded-end-pill d-flex justify-content-start align-items-center">
                 <div class="col-1"></div>
                 <h5 class="dark py-2 m-0">Tareas</h5>
             </a>
-            <a href="<?= base_url()."inicio/mis_tareas"?>" class="col-12 text-decoration-none text-reset mb-3 dark bg-azulito<?php if(!isset($pagina)) echo "No";else if($pagina!=2) echo "No"; ?> rounded-end-pill d-flex justify-content-start align-items-center">
+            <a href="<?= base_url()."inicio/mis_tareas"?>" class="col-12 text-decoration-none text-reset mb-3 dark bg-azulitoNo rounded-end-pill d-flex justify-content-start align-items-center">
                 <div class="col-1"></div>
                 <h5 class="dark py-2 m-0">Mis tareas</h5>
             </a>
-            <a href="<?= base_url()."inicio/tareas_compartidas"?>" class="col-12 text-decoration-none text-reset mb-3 dark bg-azulito<?php if(!isset($pagina)) echo "No";else if($pagina!=3) echo "No"; ?> rounded-end-pill d-flex justify-content-start align-items-center">
+            <a href="<?= base_url()."inicio/tareas_compartidas"?>" class="col-12 text-decoration-none text-reset mb-3 dark bg-azulitoNo rounded-end-pill d-flex justify-content-start align-items-center">
                 <div class="col-1"></div>
                 <h5 class="dark py-2 m-0">Tareas compartidas</h5>
             </a>
-            <a href="<?= base_url()."inicio/historial"?>" class="col-12 text-decoration-none text-reset mb-3 dark bg-azulito<?php if(!isset($pagina)) echo "No";else if($pagina!=4) echo "No"; ?> rounded-end-pill d-flex justify-content-start align-items-center">
+            <a href="<?= base_url()."inicio/historial"?>" class="col-12 text-decoration-none text-reset mb-3 dark bg-azulitoNo rounded-end-pill d-flex justify-content-start align-items-center">
                 <div class="col-1"></div>
                 <h5 class="dark py-2 m-0">Historial</h5>
             </a>
@@ -242,7 +242,7 @@
                         }}?>
                 </div>
             </div>
-            <div class="crearComentario d-flex align-items-center justify-content-between mt-3 mb-2">
+            <div class="col-11 crearComentario d-flex align-items-center justify-content-between mt-3 mb-2">
                 <div class="col-6 d-flex align-items-center">
                     <?php $mensaje=session()->getFlashdata("mensaje"); ?>
                     <h5 class="dark m-0 ms-4 border-bottom border-<?php if(isset($mensaje["success"]))echo "success";elseif(isset($mensaje["success"])) echo "danger";?>"><?php if(isset($mensaje["mensaje"])) echo $mensaje["mensaje"];?></h5>

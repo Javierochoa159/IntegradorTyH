@@ -13,6 +13,9 @@ Class Inicio extends BaseController{
     public function index(){
         if(session()->has("usuario")){
             try{
+                if(session()->get("pagina")==null){
+                    session()->set("pagina",1);
+                }
                 $userModel=new UsuarioModel();
                 $user=$userModel->getIdUsuario();
                 if(empty($user)){

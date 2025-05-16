@@ -7,8 +7,8 @@ class UsuarioModel extends Model{
     protected $primaryKey = 'idUsuario';
     protected $useAutoIncrement=true;
     protected $returnType = 'array';
-    protected $useSoftDeletes = false;
-    protected $allowedFields = ['usuarioUsuario', 'emailUsuario','passUsuario'];
+    protected $useSoftDeletes = true;
+    protected $allowedFields = ['usuarioUsuario', 'emailUsuario','passUsuario','deleted_at'];
     protected bool $updateOnlyChanged = true;
 
     public function getIdUsuario(){
