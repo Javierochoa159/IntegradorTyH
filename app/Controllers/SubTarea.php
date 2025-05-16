@@ -420,28 +420,32 @@ class SubTarea extends BaseController{
                 }else{
                     return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentar acceder a la subTarea"]);
                 }
+                $comentarioModel=new ComentarioModel();
+                if(!$comentarioModel->deleteAllComentariosFromSubTarea($trueIdSubTarea)){
+                    $comentarioModel=null;
+                    return redirect()->to(base_url()."tarea/".$idSubTarea)->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentear eliminar los comentarios de la subTarea.<br>Intente nuevamente en unos minutos."]);
+                }
                 $subTareaModel=new SubTareaModel();
                 if(!$subTareaModel->deleteSubTarea($trueIdSubTarea)){
                     $subTareaModel=null;
                     return redirect()->to(base_url()."tarea/".$idSubTarea)->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentear eliminar la subTarea.<br>Intente nuevamente en unos minutos."]);
-                }else{
-                    $subTareaModel=null;
-                    $TCModel=new TareaCompartidaModel();
-                    $res=$TCModel->deleteTCsSubTarea($trueIdSubTarea);
-                    if(!$res){
-                        $i=0;
-                        while(!$res && $i<10){
-                            $res=$TCModel->deleteTCsSubTarea($trueIdSubTarea);
-                            $i++;
-                        }
-                        if(!$res){
-                            $TCModel=null;
-                            return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"SubTarea eliminada con exito.<br>No se pudieron eliminar las relaciones de la subTarea"]);
-                        }
-                    }
-                    $TCModel=null;
-                    return redirect()->to(base_url()."inicio")->with("mensaje",["success"=>"","mensaje"=>"SubTarea eliminada con exito"]);
                 }
+                $subTareaModel=null;
+                $TCModel=new TareaCompartidaModel();
+                $res=$TCModel->deleteTCsSubTarea($trueIdSubTarea);
+                if(!$res){
+                    $i=0;
+                    while(!$res && $i<10){
+                        $res=$TCModel->deleteTCsSubTarea($trueIdSubTarea);
+                        $i++;
+                    }
+                    if(!$res){
+                        $TCModel=null;
+                        return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"SubTarea eliminada con exito.<br>No se pudieron eliminar las relaciones de la subTarea"]);
+                    }
+                }
+                $TCModel=null;
+                return redirect()->to(base_url()."inicio")->with("mensaje",["success"=>"","mensaje"=>"SubTarea eliminada con exito"]);
             }
             return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentar obtener la subTarea."]);
         }catch(Error $e){

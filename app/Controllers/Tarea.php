@@ -443,26 +443,37 @@ class Tarea extends BaseController{
                 }else{
                     return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentar acceder a la tarea"]);
                 }
+                $comentarioModel=new ComentarioModel();
+                if(!$comentarioModel->deleteAllComentariosFromTarea($trueIdTarea)){
+                    $comentarioModel=null;
+                    return redirect()->to(base_url()."tarea/".$idTarea)->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentear eliminar los comentarios dentro de la tarea.<br>Intente nuevamente en unos minutos."]);
+                }
+                $comentarioModel=null;
+                $subTareaModel=new SubTareaModel();
+                if(!$subTareaModel->deleteSubTareasTarea($trueIdTarea)){
+                    $subTareaModel=null;
+                    return redirect()->to(base_url()."tarea/".$idTarea)->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentear eliminar las subTareas de la tarea.<br>Intente nuevamente en unos minutos."]);
+                }
+                $subTareaModel=null;
                 $tareaModel=new TareaModel();
                 if(!$tareaModel->deleteTarea($trueIdTarea)){
                     $tareaModel=null;
                     return redirect()->to(base_url()."tarea/".$idTarea)->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentear eliminar la tarea.<br>Intente nuevamente en unos minutos."]);
-                }else{
-                    $TCModel=new TareaCompartidaModel();
-                    $res=$TCModel->deleteTCsTarea($trueIdTarea);
-                    if(!$res){
-                        $i=0;
-                        while(!$res && $i<10){
-                            $res=$TCModel->deleteTCsTarea($trueIdTarea);
-                            $i++;
-                        }
-                        if(!$res){
-                            return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Tarea eliminada con exito.<br>No se pudieron eliminar las relaciones de la tarea"]);
-                        }
-                    }
-                    $tareaModel=null;
-                    return redirect()->to(base_url()."inicio")->with("mensaje",["success"=>"","mensaje"=>"Tarea eliminada con exito"]);
                 }
+                $tareaModel=null;
+                $TCModel=new TareaCompartidaModel();
+                $res=$TCModel->deleteTCsTarea($trueIdTarea);
+                if(!$res){
+                    $i=0;
+                    while(!$res && $i<10){
+                        $res=$TCModel->deleteTCsTarea($trueIdTarea);
+                        $i++;
+                    }
+                    if(!$res){
+                        return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Tarea eliminada con exito.<br>No se pudieron eliminar las relaciones de la tarea"]);
+                    }
+                }
+                return redirect()->to(base_url()."inicio")->with("mensaje",["success"=>"","mensaje"=>"Tarea eliminada con exito"]);
             }
             return redirect()->to(base_url()."inicio")->with("mensaje",["error"=>"","mensaje"=>"Ocurrio un error al intentar obtener la tarea."]);
         }catch(Error $e){

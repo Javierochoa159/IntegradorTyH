@@ -31,8 +31,9 @@ class TareaModel extends Model{
         $sql='SELECT tareas.idTarea AS id, tareas.tituloTarea AS titulo, tareas.prioridadTarea AS prioridad, tareas.prioridadTarea AS prioridadOrdenada, tareas.estadoTarea AS estado, tareas.fechaVencimientoTarea AS fechaVencimiento, tareas.fechaRecordatorioTarea AS fechaRecordatorio, tareas.colorTarea AS color, tareas.recordatorioNotificado AS recoNotify, tareas.autorTarea AS autor, "tarea" AS tarea_subtarea
                                         FROM tareas
                                         LEFT JOIN tareasCompartidas ON tareasCompartidas.idTarea=tareas.idTarea
-                                        WHERE    (tareas.autorTarea = '.session()->get("usuario")["id"].' AND tareas.tareaArchivada = 0)
-                                                OR (tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].' AND tareasCompartidas.estadoTareaCompartida = "1" AND tareasCompartidas.idSubTarea IS NULL)
+                                        WHERE   ((tareas.autorTarea = '.session()->get("usuario")["id"].' AND tareas.tareaArchivada = 0)
+                                                OR (tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].' AND tareasCompartidas.estadoTareaCompartida = "1" AND tareasCompartidas.idSubTarea IS NULL))
+                                                AND tareas.deleted_at IS NULL
                                         UNION
                                             SELECT subTareas.idSubTarea AS id, subTareas.descripcionSubTarea AS titulo, subTareas.prioridadSubTarea AS prioridad,CASE 
                                                 WHEN subTareas.prioridadSubTarea = 4 THEN 3
@@ -43,6 +44,7 @@ class TareaModel extends Model{
                                             FROM subTareas
                                             LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea=subTareas.idSubTarea
                                             WHERE tareasCompartidas.estadoTareaCompartida="1"
+                                                    AND subTareas.deleted_at IS NULL
                                                     AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].' 
                                         ';
         $sql.=$orden;
@@ -62,6 +64,7 @@ class TareaModel extends Model{
                                         FROM tareas
                                         WHERE tareas.autorTarea = '.session()->get("usuario")["id"].'
                                                 AND tareas.tareaArchivada = 0
+                                                AND tareas.deleted_at IS NULL
                                         ';
         $sql.=$orden;
         $query   = $db->query($sql);
@@ -76,6 +79,7 @@ class TareaModel extends Model{
                                     FROM tareas
                                     LEFT JOIN tareasCompartidas ON tareasCompartidas.idTarea=tareas.idTarea
                                     WHERE tareasCompartidas.estadoTareaCompartida = "1"
+                                            AND tareas.deleted_at IS NULL
                                             AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].'
                                             AND tareasCompartidas.idSubTarea IS NULL
                                     UNION
@@ -88,6 +92,7 @@ class TareaModel extends Model{
                                         FROM subTareas
                                         LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea=subTareas.idSubTarea
                                         WHERE tareasCompartidas.estadoTareaCompartida = "1"
+                                                AND subTareas.deleted_at IS NULL
                                                 AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].'
                                     ';
         $sql.=$orden;
@@ -103,6 +108,7 @@ class TareaModel extends Model{
                                         FROM tareas
                                         WHERE tareas.autorTarea = '.session()->get("usuario")["id"].'
                                                 AND tareas.tareaArchivada = 1
+                                                AND tareas.deleted_at IS NULL
                                         ';
         $sql.=$orden;
         $query   = $db->query($sql);
@@ -118,11 +124,13 @@ class TareaModel extends Model{
                                     LEFT JOIN tareasCompartidas ON tareasCompartidas.idTarea=tareas.idTarea
                                     WHERE tareas.idTarea = '.$idTarea.'
                                             AND tareas.tareaArchivada = 1
+                                            AND tareas.deleted_at IS NULL
                                             AND tareas.autorTarea = '.session()->get("usuario")["id"].'
                                     UNION
                                         SELECT subTareas.idSubTarea AS id, "" AS titulo, subTareas.descripcionSubTarea AS descripcion, subTareas.prioridadSubTarea AS prioridad, subTareas.estadoSubTarea AS estado, subTareas.fechaVencimientoSubTarea AS fechaVencimiento, "" AS fechaRecordatorio, subTareas.colorSubTarea AS color, subTareas.autorSubTarea AS autor, NULL AS tipoTC, "subtarea" AS tarea_subtarea
                                         FROM subTareas
                                         WHERE subTareas.idTarea = '.$idTarea.'
+                                              AND subTareas.deleted_at IS NULL
                                     ';
         $sql.=$orden;
         $query   = $db->query($sql);
@@ -137,6 +145,7 @@ class TareaModel extends Model{
                                     FROM tareas
                                     LEFT JOIN tareasCompartidas ON tareasCompartidas.idTarea=tareas.idTarea
                                     WHERE tareas.idTarea='.$idTarea.'
+                                          AND tareas.deleted_at IS NULL
                                             AND (
                                                 (tareas.autorTarea = '.session()->get("usuario")["id"].' AND tareas.tareaArchivada = 0)
                                                 OR
@@ -147,6 +156,7 @@ class TareaModel extends Model{
                                         FROM subTareas
                                         LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea=subTareas.idSubTarea
                                         WHERE subTareas.idTarea = '.$idTarea.'
+                                              AND subTareas.deleted_at IS NULL
                                                 AND (subTareas.autorSubTarea = '.session()->get("usuario")["id"].'
                                                     OR
                                                     (tareasCompartidas.estadoTareaCompartida="1" AND tareasCompartidas.idUsuario = '.session()->get("usuario")["id"].')

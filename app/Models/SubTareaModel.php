@@ -34,6 +34,7 @@ class SubTareaModel extends Model{
                                     FROM subTareas
                                     LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea=subTareas.idSubTarea
                                     WHERE subTareas.idSubTarea = '.$idSubTarea.'
+                                            AND subTareas.deleted_at IS NULL
                                             AND (subTareas.autorSubTarea = '.session()->get("usuario")["id"].'
                                                     OR
                                                     (tareasCompartidas.estadoTareaCompartida="1" 
@@ -45,6 +46,7 @@ class SubTareaModel extends Model{
                                         LEFT JOIN subTareas ON subTareas.idSubTarea= comentarios.idSubTarea
                                         LEFT JOIN tareasCompartidas ON tareasCompartidas.idSubTarea= comentarios.idSubTarea
                                         WHERE   comentarios.estado = 1
+                                                AND comentarios.deleted_at IS NULL
                                                 AND comentarios.idSubTarea='.$idSubTarea.'
                                                 AND (subTareas.autorSubTarea = '.session()->get("usuario")["id"].' 
                                                         OR
