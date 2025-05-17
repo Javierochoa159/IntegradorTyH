@@ -89,7 +89,7 @@ class IntegradorTyHDBModel extends Model{
             "estadoTarea"=>[
                 "type" => "enum",
                 "constraint" => ["1","2","3"],
-                "default" => 1
+                "default" => "1"
             ],
             "fechaVencimientoTarea" => [
                 "type" => "datetime",
