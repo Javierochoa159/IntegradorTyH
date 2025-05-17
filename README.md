@@ -1,60 +1,37 @@
-# CodeIgniter 4 Framework
+# Proyecto Web de Tecnicas y Herramientas con Framework CodeIgniter 4
 
-## What is CodeIgniter?
+## Como iniciar el proyecto?
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+Solo descargar el proyecto por el método que desee. Una ves descargado tendrá que configurar el archivo .env con los siguientes parámetros:
 
-This repository holds the distributable version of the framework.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+### Configuracion del entorno de desarrollo
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+ -  CI_ENVIRONMENT = *Ingrese el metodo deseado: development, production, testing (para PHPUnit). ejemplo:* testing
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+### URL Base del sistema
 
-## Important Change with index.php
+  - app.baseURL = *URL en donde desea alojar el proyecto, mas /public/index.php/, ejemplo: *http://127.0.0.1/CarpetaRaiz/public/index.php/
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+### Configuracion de la Base de Datos
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+  - database.default.hostname = *URL raíz de su base de datos, ejemplo:* 127.0.0.1
+  - database.default.database = IntegradorTyH *En este caso tiene que llamarse así solo si no se modifica el nombre dentro del archivo models/IntegradorTyHDBModel.php en la línea 22* 
+  - database.default.username = *nombre del usuario de su cuenta en la DB manejada, ejemplo:* root
+  - database.default.password = *contraseña de su cuenta en la DB manejada*
+  - database.default.DBDriver = MySQLi *Esta configuración esta hecha para funcionar en MySQL, si desea cambiar de servicio haga los cambios pertinentes en la configuración*
+  - database.default.DBPrefix = *En este caso no se utiliza este apartado, por lo que se deja comentado con un #, ejemplo: #database.default.DBPrefix. Si desea utilizarlo, remueva el #* 
+  - database.default.port = *Puerto utilizado para acceder al servicio de base de datos, ejemplo:* 3306
 
-**Please** read the user guide for a better explanation of how CI4 works!
+  - database.aux.hostname = *Misma URL raíz ingresada en database.default.hostname*
+  - database.aux.database = *Este espacio debe quedar en blanco para que el sistema pueda acceder a la raíz del servicio de base de datos y no apuntar a una DB en concreto dentro del servicio*
+  - database.aux.username = *Mismo nombre de usuario ingresado en database.default.username*
+  - database.aux.password = *Misma contraseña ingresada en database.default.password*
+  - database.aux.DBDriver = MySQLi
+  - database.aux.DBPrefix = *Misma configuracion ingresada en database.default.DBPrefix*
+  - database.aux.port = *Mismo puerto ingresado en database.default.port*
 
-## Repository Management
+### Encriptacion
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+  - encryption.key = *Elija un conjunto de caracteres del largor deseado para que se haga el cifrado*
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
-
-## Contributing
-
-We welcome contributions from the community.
-
-Please read the [*Contributing to CodeIgniter*](https://github.com/codeigniter4/CodeIgniter4/blob/develop/CONTRIBUTING.md) section in the development repository.
-
-## Server Requirements
-
-PHP version 8.1 or higher is required, with the following extensions installed:
-
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
-
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
-> - The end of life date for PHP 8.1 will be December 31, 2025.
-
-Additionally, make sure that the following extensions are enabled in your PHP:
-
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+## Una ves configurado el .env solo quedara iniciar el servicio hosting con el proyecto en él
