@@ -27,7 +27,7 @@ Solo descargar el proyecto por el método que desee. Una ves descargado tendrá 
 #### Conexión con la dirección raíz del servicio de Bases de Datos
 
   - database.aux.hostname = *"Misma URL raíz ingresada en database.default.hostname"*
-  - database.aux.database = *"Este espacio debe quedar en blanco para que el sistema pueda acceder a la raíz del servicio de base de datos y no apuntar a una DB en concreto dentro del servicio"*
+  - database.aux.database = *"Este espacio debe quedar en blanco para que el sistema pueda acceder a la raíz del servicio de bases de datos y no apuntar a una DB en concreto dentro del servicio"*
   - database.aux.username = *"Mismo nombre de usuario ingresado en database.default.username"*
   - database.aux.password = *"Misma contraseña ingresada en database.default.password"*
   - database.aux.DBDriver = *"Misma configuracion ingresada en database.default.DBDriver"*
@@ -39,3 +39,5 @@ Solo descargar el proyecto por el método que desee. Una ves descargado tendrá 
   - encryption.key = *"Elija un conjunto de caracteres del largor deseado para que se haga el cifrado"*
 
 ## Una ves configurado el .env solo quedara iniciar el servicio hosting con el proyecto en él
+
+# Por favor, cree una nueva rama al momento de efectuar cambios en el proyecto
