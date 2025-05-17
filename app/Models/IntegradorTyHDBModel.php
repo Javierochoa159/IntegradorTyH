@@ -48,6 +48,10 @@ class IntegradorTyHDBModel extends Model{
             "passUsuario" => [
                 "type" => "varchar",
                 "constraint" => 255,
+            ],
+            "deleted_at" => [
+                "type" => "datetime",
+                "null" => true
             ]
         ];
 
@@ -110,6 +114,10 @@ class IntegradorTyHDBModel extends Model{
             "autorTarea" => [
                 "type"=> "int",
                 "unasigned" => true
+            ],
+            "deleted_at" => [
+                "type" => "datetime",
+                "null" => true
             ]
         ];
 
@@ -142,7 +150,7 @@ class IntegradorTyHDBModel extends Model{
             "estadoSubTarea"=>[
                 "type" => "enum",
                 "constraint" => ["1","2","3"],
-                "default" => 1
+                "default" => "1"
             ],
             "prioridadSubTarea"=>[
                 "type" => "enum",
@@ -169,6 +177,10 @@ class IntegradorTyHDBModel extends Model{
             "idTarea" => [
                 "type"=> "int",
                 "unasigned" => true
+            ],
+            "deleted_at" => [
+                "type" => "datetime",
+                "null" => true
             ]
         ];
 
@@ -201,9 +213,13 @@ class IntegradorTyHDBModel extends Model{
     }
     private function initTareaCompartidaModel(){
         $fields=[
+            "idTareaCompartida" => [
+                "type" => "INT",
+                "unasigned" => true,
+                "auto_increment" => true
+            ],
             "idTarea" => [
                 "type" => "INT",
-                "null" => true,
                 "unasigned" => true
             ],
             "idSubTarea" => [
@@ -218,14 +234,21 @@ class IntegradorTyHDBModel extends Model{
             "tipoTareaCompartida" => [
                 "type" => "enum",
                 "constraint" => ["1","2","3"],
-                "default"=> 1
+                "default"=> "1"
             ],
             "estadoTareaCompartida" => [
-                "type" => "boolean",
-                "default" => true
+                "type" => "enum",
+                "constraint" => ["0","1","2","3"],
+                "default" => "0"
+            ],
+            "deleted_at" => [
+                "type" => "datetime",
+                "null" => true
             ]
         ];
 
+
+        $this->forge->addPrimaryKey("idTareaCompartida");
         $this->forge->addForeignKey("idTarea",
                                     "Tareas",
                                     "idTarea",
@@ -274,6 +297,10 @@ class IntegradorTyHDBModel extends Model{
             "estado" => [
                 "type" => "boolean",
                 "default" => true
+            ],
+            "deleted_at" => [
+                "type" => "datetime",
+                "null" => true
             ]
         ];
 
