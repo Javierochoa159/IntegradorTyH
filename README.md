@@ -14,13 +14,17 @@ Solo descargar el proyecto por el método que desee. Una ves descargado tendrá 
 
 ### Configuracion de la Base de Datos
 
+#### Conexión con la Base de Datos
+
   - database.default.hostname = *"URL raíz de su base de datos" ejemplo:* 127.0.0.1
   - database.default.database = IntegradorTyH *"En este caso tiene que llamarse así solo si no se modifica el nombre dentro del archivo models/IntegradorTyHDBModel.php en la línea 22"* 
   - database.default.username = *"nombre del usuario de su cuenta en la DB manejada" ejemplo:* root
   - database.default.password = *"contraseña de su cuenta en la DB manejada"*
-  - database.default.DBDriver = MySQLi *"Esta configuración esta hecha para funcionar en MySQL, si desea cambiar de servicio haga los cambios pertinentes en la configuración"*
+  - database.default.DBDriver = MySQLi *"Esta configuración esta hecha para funcionar en MySQLi, si desea cambiar de servicio haga los cambios pertinentes en la configuración"*
   - database.default.DBPrefix = *"En este caso no se utiliza este apartado, por lo que se deja comentado con un #, ejemplo: #database.default.DBPrefix. Si desea utilizarlo, remueva el #"* 
   - database.default.port = *"Puerto utilizado para acceder al servicio de base de datos" ejemplo:* 3306
+
+#### Conexión con la dirección raíz del servicio de Bases de Datos
 
   - database.aux.hostname = *"Misma URL raíz ingresada en database.default.hostname"*
   - database.aux.database = *"Este espacio debe quedar en blanco para que el sistema pueda acceder a la raíz del servicio de base de datos y no apuntar a una DB en concreto dentro del servicio"*
