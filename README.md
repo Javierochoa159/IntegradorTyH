@@ -42,7 +42,7 @@ Solo descargar el proyecto por el método que desee. Una ves descargado tendrá 
 
 ### Creación de la base de datos
 
-  - "Ingrese a la dirección URL raíz de su hosting con la carpeta que contiene el proyecto, mas /public/index.php/integradortyhdb, en su navegador" ejemplo: *http://127.0.0.1/CarpetaRaiz/public/index.php/integradortyhdb*
+  - *"Ingrese a la dirección URL raíz de su hosting con la carpeta que contiene el proyecto, mas /public/index.php/integradortyhdb, en su navegador" ejemplo:* http://127.0.0.1/CarpetaRaiz/public/index.php/integradortyhdb <br/>
   *En caso de que haya cambiado el nombre de la base de datos, puede modificar la ruta en el archivo app/Config/Routes.php línea 30*
 
 # Por favor, cree una nueva rama al momento de efectuar cambios en el proyecto
