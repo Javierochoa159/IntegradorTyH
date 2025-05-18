@@ -10,7 +10,7 @@ Solo descargar el proyecto por el método que desee. Una ves descargado tendrá 
 
 ### URL Base del sistema
 
-  - app.baseURL = *"URL en donde desea alojar el proyecto, mas /public/index.php/" ejemplo:* http://127.0.0.1/CarpetaRaiz/public/index.php/
+  - app.baseURL = "URL en donde desea alojar el proyecto, mas /public/index.php/" ejemplo: *http://127.0.0.1/CarpetaRaiz/public/index.php/*
 
 ### Configuracion de la Base de Datos
 
@@ -39,5 +39,10 @@ Solo descargar el proyecto por el método que desee. Una ves descargado tendrá 
   - encryption.key = *"Elija un conjunto de caracteres del largor deseado para que se haga el cifrado"*
 
 ## Una ves configurado el .env solo quedara iniciar el servicio hosting con el proyecto en él
+
+### Creación de la base de datos
+
+  - "Ingrese a la dirección URL raíz de su hosting con la carpeta que contiene el proyecto, mas /public/index.php/integradortyhdb, en su navegador" ejemplo: *http://127.0.0.1/CarpetaRaiz/public/index.php/integradortyhdb*
+  *En caso de que haya cambiado el nombre de la base de datos, puede modificar la ruta en el archivo app/Config/Routes.php línea 30*
 
 # Por favor, cree una nueva rama al momento de efectuar cambios en el proyecto
